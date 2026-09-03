@@ -3,91 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>아기 해열제 용량 계산기</title>
+  <title>우리아기 상비약 & 수분량 종합 계산기</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
-    body { background-color: #f4f6f8; margin: 0; padding: 20px 16px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 420px; background: #ffffff; border-radius: 20px; padding: 24px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-    h1 { font-size: 20px; text-align: center; color: #2d3748; margin-bottom: 20px; }
+    body { background-color: #f1f5f9; margin: 0; padding: 16px 12px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 440px; background: #ffffff; border-radius: 22px; padding: 22px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    h1 { font-size: 20px; text-align: center; color: #1e293b; margin: 0 0 16px 0; }
     
-    .input-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-    .input-box label { font-size: 15px; font-weight: 600; color: #4a5568; }
-    .input-box input { width: 100px; font-size: 20px; font-weight: bold; text-align: right; border: none; background: transparent; outline: none; color: #1a202c; }
-    .input-box span { font-size: 16px; font-weight: 600; color: #718096; margin-left: 6px; }
+    .input-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+    .input-card label { font-size: 15px; font-weight: 700; color: #334155; }
+    .input-wrap { display: flex; align-items: center; }
+    .input-wrap input { width: 90px; font-size: 22px; font-weight: 800; text-align: right; border: none; background: transparent; outline: none; color: #0f172a; }
+    .input-wrap span { font-size: 16px; font-weight: 700; color: #64748b; margin-left: 6px; }
 
-    .card { border-radius: 14px; padding: 16px; margin-bottom: 14px; }
-    .card-tylenol { background-color: #fff5f5; border: 1px solid #fed7d7; }
-    .card-maxibufen { background-color: #ebf8ff; border: 1px solid #bee3f8; }
-    
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .card-title { font-size: 16px; font-weight: bold; }
-    .card-tylenol .card-title { color: #c53030; }
-    .card-maxibufen .card-title { color: #2b6cb0; }
-    .badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
-    .card-tylenol .badge { background: #fed7d7; color: #9b2c2c; }
-    .card-maxibufen .badge { background: #bee3f8; color: #2c5282; }
+    .section-label { font-size: 13px; font-weight: 800; color: #64748b; margin: 16px 0 8px 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #4a5568; }
+    .card { border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+    .card-aap { background-color: #fff1f2; border: 1px solid #fecdd3; }
+    .card-dex { background-color: #f0f9ff; border: 1px solid #bae6fd; }
+    .card-ibu { background-color: #fefce8; border: 1px solid #fef08a; }
+    .card-dig { background-color: #f0fdf4; border: 1px solid #bbf7d0; }
+    .card-ors { background-color: #faf5ff; border: 1px solid #e9d5ff; }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .card-title { font-size: 15px; font-weight: 800; }
+    .card-aap .card-title { color: #be123c; }
+    .card-dex .card-title { color: #0369a1; }
+    .card-ibu .card-title { color: #854d0e; }
+    .card-dig .card-title { color: #15803d; }
+    .card-ors .card-title { color: #7e22ce; }
+
+    .badge { font-size: 11px; padding: 2px 7px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
+    .card-aap .badge { background: #ffe4e6; color: #9f1239; }
+    .card-dex .badge { background: #e0f2fe; color: #075985; }
+    .card-ibu .badge { background: #fef9c3; color: #713f12; }
+    .card-dig .badge { background: #dcfce7; color: #166534; }
+    .card-ors .badge { background: #f3e8ff; color: #6b21a8; }
+
+    .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; color: #475569; }
     .row:last-child { margin-bottom: 0; }
-    .val { font-weight: 700; color: #1a202c; }
+    .val { font-weight: 800; color: #0f172a; }
 
-    .guide-box { background: #f7fafc; border-radius: 12px; padding: 14px; margin-top: 18px; border-left: 4px solid #718096; }
-    .guide-title { font-size: 13px; font-weight: bold; color: #2d3748; margin-bottom: 6px; }
-    .guide-desc { font-size: 12px; color: #4a5568; line-height: 1.5; margin: 0; }
+    .guide-box { background: #f8fafc; border-radius: 12px; padding: 12px 14px; margin-top: 16px; border-left: 4px solid #64748b; font-size: 12px; color: #475569; line-height: 1.6; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>👶 아기 해열제 용량 계산기</h1>
+  <h1>👶 아기 상비약 종합 계산기</h1>
 
-  <div class="input-box">
-    <label for="weight">현재 체중</label>
-    <div>
-      <input type="number" id="weight" step="0.1" value="7.2" inputmode="decimal">
+  <div class="input-card">
+    <label for="weight">아기 현재 체중</label>
+    <div class="input-wrap">
+      <input type="number" id="weight" step="0.1" value="10.0" inputmode="decimal">
       <span>kg</span>
     </div>
   </div>
 
-  <!-- 타이레놀 -->
-  <div class="card card-tylenol">
+  <div class="section-label">1. 해열 · 진통제 계열</div>
+
+  <!-- 아세트아미노펜 -->
+  <div class="card card-aap">
     <div class="card-header">
-      <span class="card-title">타이레놀 계열 (아세트아미노펜)</span>
+      <span class="card-title">아세트아미노펜 (타이레놀계열)</span>
       <span class="badge">챔프 빨강 / 콜대원 펜</span>
     </div>
     <div class="row">
-      <span>1회 권장 용량 (체중 × 0.4)</span>
-      <span class="val" id="aap-single">2.9 ml</span>
+      <span>1회 권장량 (체중 × 0.4ml)</span>
+      <span class="val" id="aap-single">4.0 ml</span>
     </div>
     <div class="row">
-      <span>1일 최대 용량 (체중 × 2.3)</span>
-      <span class="val" id="aap-max">16.6 ml</span>
+      <span>1일 최대 한도 (체중 × 2.3ml)</span>
+      <span class="val" id="aap-max">23.0 ml</span>
     </div>
   </div>
 
-  <!-- 맥시부펜 -->
-  <div class="card card-maxibufen">
+  <!-- 덱시부프로펜 -->
+  <div class="card card-dex">
     <div class="card-header">
-      <span class="card-title">맥시부펜 계열 (덱시부프로펜)</span>
-      <span class="badge">챔프 파랑</span>
+      <span class="card-title">덱시부프로펜 (맥시부펜계열)</span>
+      <span class="badge">맥시부펜 / 챔프 파랑</span>
     </div>
     <div class="row">
-      <span>1회 권장 용량 (체중 × 0.6)</span>
-      <span class="val" id="dex-single">4.3 ml</span>
+      <span>1회 권장량 (체중 × 0.6ml)</span>
+      <span class="val" id="dex-single">6.0 ml</span>
     </div>
     <div class="row">
-      <span>1일 최대 용량 (최대 25ml)</span>
-      <span class="val" id="dex-max">17.3 ml</span>
+      <span>1일 최대 한도 (상한 25ml)</span>
+      <span class="val" id="dex-max">24.0 ml</span>
     </div>
   </div>
 
-  <!-- 투약 간격 안내 -->
+  <!-- 이부프로펜 -->
+  <div class="card card-ibu">
+    <div class="card-header">
+      <span class="card-title">이부프로펜 (부루펜계열)</span>
+      <span class="badge">어린이 부루펜 / 콜대원 오렌지</span>
+    </div>
+    <div class="row">
+      <span>1회 권장량 (체중 × 0.45ml)</span>
+      <span class="val" id="ibu-single">4.5 ml</span>
+    </div>
+    <div class="row">
+      <span>1일 최대 한도 (체중 × 2.0ml)</span>
+      <span class="val" id="ibu-max">20.0 ml</span>
+    </div>
+  </div>
+
+  <div class="section-label">2. 소화기 & 탈수 수분 보충</div>
+
+  <!-- 백초시럽 -->
+  <div class="card card-dig">
+    <div class="card-header">
+      <span class="card-title">백초시럽 플러스 (소화정장)</span>
+      <span class="badge">돌(만 1세) 이상</span>
+    </div>
+    <div class="row">
+      <span>만 1세~2세 1회 권장량</span>
+      <span class="val" id="baekcho-dose">1.5 ~ 2.0 ml</span>
+    </div>
+    <div class="row">
+      <span>복용 기준</span>
+      <span class="val">1일 3회 식후 (체함/복통)</span>
+    </div>
+  </div>
+
+  <!-- 경구수액 탈수 보충량 -->
+  <div class="card card-ors">
+    <div class="card-header">
+      <span class="card-title">경구수액 (전해질/탈수 보충)</span>
+      <span class="badge">페디라 / 링티키즈</span>
+    </div>
+    <div class="row">
+      <span>초기 4시간 목표 보충량 (체중 × 50ml)</span>
+      <span class="val" id="ors-target">500 ml</span>
+    </div>
+    <div class="row">
+      <span>섭취 방법</span>
+      <span class="val">5~10ml씩 숟가락으로 자주 분할</span>
+    </div>
+  </div>
+
   <div class="guide-box">
-    <div class="guide-title">⏰ 복용 간격 주의사항</div>
-    <p class="guide-desc">
-      • <strong>동일 계열 재투약:</strong> 4~6시간 간격 (최소 4시간)<br>
-      • <strong>교차 투약 간격:</strong> 열이 안 떨어질 때만 최소 2시간 후 투약
-    </p>
+    ⚠️ <strong>주의사항</strong><br>
+    • <strong>교차 복용 규칙:</strong> [아세트아미노펜] ↔ [덱시부프로펜 또는 이부프로펜] 간격은 최소 2시간입니다. (덱시부프로펜과 이부프로펜은 같은 소염진통제 계열이므로 교차 복용 불가)<br>
+    • <strong>백초시럽:</strong> 만 1세 미만 영아에게는 임의 투약하지 않습니다.
   </div>
 </div>
 
@@ -97,28 +157,40 @@
   const aapMax = document.getElementById('aap-max');
   const dexSingle = document.getElementById('dex-single');
   const dexMax = document.getElementById('dex-max');
+  const ibuSingle = document.getElementById('ibu-single');
+  const ibuMax = document.getElementById('ibu-max');
+  const orsTarget = document.getElementById('ors-target');
 
-  function calculate() {
+  function updateValues() {
     const w = parseFloat(weightInput.value);
     if (isNaN(w) || w <= 0) {
       aapSingle.textContent = '- ml';
       aapMax.textContent = '- ml';
       dexSingle.textContent = '- ml';
       dexMax.textContent = '- ml';
+      ibuSingle.textContent = '- ml';
+      ibuMax.textContent = '- ml';
+      orsTarget.textContent = '- ml';
       return;
     }
 
-    // 아세트아미노펜 계산
+    // 아세트아미노펜 (10~15mg/kg -> 약 체중*0.4ml)
     aapSingle.textContent = (w * 0.4).toFixed(1) + ' ml';
     aapMax.textContent = (w * 2.3).toFixed(1) + ' ml';
 
-    // 덱시부프로펜 계산 (1일 최대 25ml 상한)
+    // 덱시부프로펜 (5~7mg/kg -> 약 체중*0.6ml, 최대 25ml)
     dexSingle.textContent = (w * 0.6).toFixed(1) + ' ml';
-    const calculatedDexMax = Math.min(w * 2.4, 25);
-    dexMax.textContent = calculatedDexMax.toFixed(1) + ' ml';
+    dexMax.textContent = Math.min(w * 2.4, 25).toFixed(1) + ' ml';
+
+    // 이부프로펜 (5~10mg/kg -> 약 체중*0.45ml, 1일 최대 40mg/kg -> 체중*2.0ml)
+    ibuSingle.textContent = (w * 0.45).toFixed(1) + ' ml';
+    ibuMax.textContent = (w * 2.0).toFixed(1) + ' ml';
+
+    // 경구수액 (경증 탈수 4시간 보충 기준 체중*50ml)
+    orsTarget.textContent = Math.round(w * 50) + ' ml';
   }
 
-  weightInput.addEventListener('input', calculate);
+  weightInput.addEventListener('input', updateValues);
 </script>
 
 </body>
