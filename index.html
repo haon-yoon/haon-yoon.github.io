@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아기 해열제 용량 계산기</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
+    body { background-color: #f4f6f8; margin: 0; padding: 20px 16px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 420px; background: #ffffff; border-radius: 20px; padding: 24px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    h1 { font-size: 20px; text-align: center; color: #2d3748; margin-bottom: 20px; }
+    
+    .input-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .input-box label { font-size: 15px; font-weight: 600; color: #4a5568; }
+    .input-box input { width: 100px; font-size: 20px; font-weight: bold; text-align: right; border: none; background: transparent; outline: none; color: #1a202c; }
+    .input-box span { font-size: 16px; font-weight: 600; color: #718096; margin-left: 6px; }
+
+    .card { border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .card-tylenol { background-color: #fff5f5; border: 1px solid #fed7d7; }
+    .card-maxibufen { background-color: #ebf8ff; border: 1px solid #bee3f8; }
+    
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .card-title { font-size: 16px; font-weight: bold; }
+    .card-tylenol .card-title { color: #c53030; }
+    .card-maxibufen .card-title { color: #2b6cb0; }
+    .badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+    .card-tylenol .badge { background: #fed7d7; color: #9b2c2c; }
+    .card-maxibufen .badge { background: #bee3f8; color: #2c5282; }
+
+    .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #4a5568; }
+    .row:last-child { margin-bottom: 0; }
+    .val { font-weight: 700; color: #1a202c; }
+
+    .guide-box { background: #f7fafc; border-radius: 12px; padding: 14px; margin-top: 18px; border-left: 4px solid #718096; }
+    .guide-title { font-size: 13px; font-weight: bold; color: #2d3748; margin-bottom: 6px; }
+    .guide-desc { font-size: 12px; color: #4a5568; line-height: 1.5; margin: 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>👶 아기 해열제 용량 계산기</h1>
+
+  <div class="input-box">
+    <label for="weight">현재 체중</label>
+    <div>
+      <input type="number" id="weight" step="0.1" value="7.2" inputmode="decimal">
+      <span>kg</span>
+    </div>
+  </div>
+
+  <!-- 타이레놀 -->
+  <div class="card card-tylenol">
+    <div class="card-header">
+      <span class="card-title">타이레놀 계열 (아세트아미노펜)</span>
+      <span class="badge">챔프 빨강 / 콜대원 펜</span>
+    </div>
+    <div class="row">
+      <span>1회 권장 용량 (체중 × 0.4)</span>
+      <span class="val" id="aap-single">2.9 ml</span>
+    </div>
+    <div class="row">
+      <span>1일 최대 용량 (체중 × 2.3)</span>
+      <span class="val" id="aap-max">16.6 ml</span>
+    </div>
+  </div>
+
+  <!-- 맥시부펜 -->
+  <div class="card card-maxibufen">
+    <div class="card-header">
+      <span class="card-title">맥시부펜 계열 (덱시부프로펜)</span>
+      <span class="badge">챔프 파랑</span>
+    </div>
+    <div class="row">
+      <span>1회 권장 용량 (체중 × 0.6)</span>
+      <span class="val" id="dex-single">4.3 ml</span>
+    </div>
+    <div class="row">
+      <span>1일 최대 용량 (최대 25ml)</span>
+      <span class="val" id="dex-max">17.3 ml</span>
+    </div>
+  </div>
+
+  <!-- 투약 간격 안내 -->
+  <div class="guide-box">
+    <div class="guide-title">⏰ 복용 간격 주의사항</div>
+    <p class="guide-desc">
+      • <strong>동일 계열 재투약:</strong> 4~6시간 간격 (최소 4시간)<br>
+      • <strong>교차 투약 간격:</strong> 열이 안 떨어질 때만 최소 2시간 후 투약
+    </p>
+  </div>
+</div>
+
+<script>
+  const weightInput = document.getElementById('weight');
+  const aapSingle = document.getElementById('aap-single');
+  const aapMax = document.getElementById('aap-max');
+  const dexSingle = document.getElementById('dex-single');
+  const dexMax = document.getElementById('dex-max');
+
+  function calculate() {
+    const w = parseFloat(weightInput.value);
+    if (isNaN(w) || w <= 0) {
+      aapSingle.textContent = '- ml';
+      aapMax.textContent = '- ml';
+      dexSingle.textContent = '- ml';
+      dexMax.textContent = '- ml';
+      return;
+    }
+
+    // 아세트아미노펜 계산
+    aapSingle.textContent = (w * 0.4).toFixed(1) + ' ml';
+    aapMax.textContent = (w * 2.3).toFixed(1) + ' ml';
+
+    // 덱시부프로펜 계산 (1일 최대 25ml 상한)
+    dexSingle.textContent = (w * 0.6).toFixed(1) + ' ml';
+    const calculatedDexMax = Math.min(w * 2.4, 25);
+    dexMax.textContent = calculatedDexMax.toFixed(1) + ' ml';
+  }
+
+  weightInput.addEventListener('input', calculate);
+</script>
+
+</body>
+</html>
