@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>오니의 종합 상비약 & 복용 가이드</title>
+  <title>오니의 종합 상비약 & 투약 가이드</title>
   <style>
     :root {
-      --primary: #3b82f6;
+      --primary: #2563eb;
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #0f172a;
@@ -18,24 +18,24 @@
     .app-container { width: 100%; max-width: 480px; }
 
     /* 헤더 */
-    .header { text-align: center; margin-bottom: 18px; }
-    .header h1 { font-size: 20px; font-weight: 800; margin: 0 0 6px; color: #1e293b; letter-spacing: -0.5px; }
+    .header { text-align: center; margin-bottom: 16px; }
+    .header h1 { font-size: 21px; font-weight: 800; margin: 0 0 6px; color: #1e293b; letter-spacing: -0.5px; }
     .header p { font-size: 13px; color: var(--text-muted); margin: 0; }
 
     /* 체중 컨트롤러 */
     .weight-card {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 16px 18px;
       color: #ffffff;
       box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
       margin-bottom: 14px;
     }
     .weight-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .weight-title { font-size: 14px; font-weight: 600; opacity: 0.9; }
+    .weight-title { font-size: 14px; font-weight: 600; opacity: 0.95; }
     .weight-display { display: flex; align-items: baseline; }
     .weight-input {
-      width: 85px;
+      width: 90px;
       background: rgba(255, 255, 255, 0.2);
       border: 1.5px solid rgba(255, 255, 255, 0.4);
       border-radius: 10px;
@@ -60,7 +60,6 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s;
     }
     .btn-step:active { background: rgba(255, 255, 255, 0.35); }
 
@@ -71,7 +70,7 @@
       background: #ffffff;
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      padding: 10px 14px 10px 38px;
+      padding: 11px 14px 11px 38px;
       font-size: 14px;
       outline: none;
       color: var(--text-main);
@@ -100,18 +99,7 @@
       border-color: #1e293b;
     }
 
-    /* 카테고리 라벨 */
-    .category-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #475569;
-      margin: 18px 0 10px 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* 약물 카드 */
+    /* 카드 */
     .card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -119,9 +107,8 @@
       padding: 14px 16px;
       margin-bottom: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-      transition: transform 0.1s;
     }
-    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
     .card-name { font-size: 15px; font-weight: 800; color: #1e293b; }
     .card-tag { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
     
@@ -132,7 +119,7 @@
     .tag-purple { background: #f3e8ff; color: #9333ea; }
     .tag-gray { background: #f1f5f9; color: #475569; }
 
-    .card-symptom { font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 500; }
+    .card-symptom { font-size: 12px; color: #475569; margin-bottom: 8px; font-weight: 500; }
     
     .dose-box {
       background: #f8fafc;
@@ -142,20 +129,20 @@
     }
     .dose-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 4px; }
     .dose-row:last-child { margin-bottom: 0; }
-    .dose-label { color: #475569; }
+    .dose-label { color: #64748b; }
     .dose-value { font-weight: 800; color: #0f172a; }
     .dose-value.highlight { color: #2563eb; font-size: 14px; }
 
     .card-info { font-size: 11.5px; color: #64748b; line-height: 1.45; background: #fff; border-top: 1px dashed var(--border); padding-top: 8px; }
     .card-info strong { color: #334155; }
 
-    /* 푸터 가이드 */
+    /* 주의 수칙 */
     .emergency-box {
       background: #fff5f5;
       border: 1px solid #fed7d7;
       border-radius: 14px;
       padding: 14px;
-      margin-top: 24px;
+      margin-top: 20px;
       font-size: 12px;
       color: #742a2a;
       line-height: 1.6;
@@ -168,11 +155,11 @@
 <div class="app-container">
   
   <div class="header">
-    <h1>🍼 오니의 상비약 & 복용 가이드</h1>
-    <p>체중 기반 자동 용량 계산 및 필수 상비약 사전</p>
+    <h1>🍼 오니의 종합 상비약 & 가이드</h1>
+    <p>체중 기반 자동 계산 및 필수 상비약 백과</p>
   </div>
 
-  <!-- 체중 설정 카드 -->
+  <!-- 체중 컨트롤러 -->
   <div class="weight-card">
     <div class="weight-top">
       <span class="weight-title">아기 현재 체중 설정</span>
@@ -189,49 +176,50 @@
     </div>
   </div>
 
-  <!-- 실시간 검색 -->
+  <!-- 검색창 -->
   <div class="search-box">
     <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" class="search-input" placeholder="약 이름 또는 증상 검색 (예: 기침, 설사, 모기)">
+    <input type="text" id="searchInput" class="search-input" placeholder="약 이름, 성분, 증상 검색 (예: 기침, 상처, 설사)">
   </div>
 
-  <!-- 카테고리 탭 -->
+  <!-- 카테고리 탭 (5대 카테고리 확장) -->
   <div class="tabs">
     <button class="tab-btn active" onclick="filterTab('all', this)">전체보기</button>
     <button class="tab-btn" onclick="filterTab('fever', this)">1. 해열·진통</button>
     <button class="tab-btn" onclick="filterTab('resp', this)">2. 호흡기·감기</button>
     <button class="tab-btn" onclick="filterTab('gut', this)">3. 소화기·장염</button>
-    <button class="tab-btn" onclick="filterTab('skin', this)">4. 피부·외용제</button>
+    <button class="tab-btn" onclick="filterTab('skin', this)">4. 피부·연고</button>
+    <button class="tab-btn" onclick="filterTab('wound', this)">5. 외상·안과·응급</button>
   </div>
 
   <div id="medicineList">
-    <!-- 자바스크립트로 17개 전 항목 동적 렌더링 -->
+    <!-- 동적 렌더링 -->
   </div>
 
-  <!-- 응급 안내 -->
+  <!-- 응급 안내 카드 -->
   <div class="emergency-box">
-    <h4>🚨 교차 복용 & 응급 수칙</h4>
-    • <strong>교차 복용 간격:</strong> [아세트아미노펜] ↔ [덱시부/이부프로펜]은 열이 떨어지지 않을 때 <strong>최소 2시간</strong> 간격을 두고 교차 복용합니다.<br>
-    • <strong>같은 계열 재투약:</strong> 동일 성분은 <strong>최소 4~6시간</strong> 간격을 반드시 유지해야 합니다.<br>
-    • <strong>병원 내원 필요:</strong> 39°C 이상 고열이 24시간 넘게 지속되거나, 8시간 이상 소변을 보지 않는 탈수 증세, 처짐이 심할 때는 즉시 소아과 진료를 받으세요.
+    <h4>🚨 교차 복용 및 필수 응급 원칙</h4>
+    • <strong>교차 복용 규칙:</strong> [아세트아미노펜] ↔ [덱시부/이부프로펜]은 열이 안 떨어질 때만 <strong>최소 2시간</strong> 간격을 둡니다.<br>
+    • <strong>동일 성분 재투약:</strong> 같은 약은 <strong>최소 4~6시간</strong> 간격을 반드시 엄수해야 합니다.<br>
+    • <strong>즉시 진료 신호:</strong> 39°C 이상 고열 24시간 지속, 8시간 이상 기저귀 마름(탈수), 눈 풀림 또는 전신 경련 시 즉시 응급실로 내원하세요.
   </div>
 
 </div>
 
 <script>
-  // 엑셀 시트 100% 동기화 데이터
+  // 종합 23종 상비약 및 응급용품 데이터베이스
   const meds = [
-    // 1. 해열 · 진통 · 소염 관리
+    // 1. 해열 · 진통 · 소염
     {
       cat: 'fever',
       name: '아세트아미노펜',
       products: '타이레놀, 챔프 빨강, 콜대원 펜',
       tagClass: 'tag-red',
-      symptom: '초기 발열, 접종열, 두통',
+      symptom: '초기 발열, 예방접종열, 두통',
       calcSingle: (w) => (w * 0.35).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml',
       calcMax: (w) => (w * 2.3).toFixed(1) + ' ml',
-      interval: '4~6시간 간격 (1일 5회 이내)',
-      note: '실온 보관, 공복 복용 가능 (위장 장애 적음)'
+      interval: '4~6시간 간격 (1일 최대 5회 이내)',
+      note: '실온 보관, 공복 복용 가능 (위장 장애가 가장 적음)'
     },
     {
       cat: 'fever',
@@ -240,30 +228,30 @@
       tagClass: 'tag-blue',
       symptom: '38.5°C 이상 고열, 목 염증 (인후염)',
       calcSingle: (w) => (w * 0.3).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml',
-      calcMax: (w) => Math.min(w * 2.4, 25).toFixed(1) + ' ml (최대 25ml)',
-      interval: '4~6시간 간격 (1일 4회 이내)',
-      note: '실온 보관, 식후 복용 권장 (소염 진통 효과 우수)'
+      calcMax: (w) => Math.min(w * 2.4, 25).toFixed(1) + ' ml (상한 25ml)',
+      interval: '4~6시간 간격 (1일 최대 4회 이내)',
+      note: '실온 보관, 식후 복용 권장 (소염 진통 효과가 뛰어남)'
     },
     {
       cat: 'fever',
       name: '이부프로펜',
       products: '어린이 부루펜, 콜대원 오렌지',
       tagClass: 'tag-yellow',
-      symptom: '고열, 이앓이, 전신 통증',
+      symptom: '고열, 이앓이 통증, 관절/근육통',
       calcSingle: (w) => (w * 0.4).toFixed(1) + ' ~ ' + (w * 0.5).toFixed(1) + ' ml',
       calcMax: (w) => (w * 2.0).toFixed(1) + ' ml',
-      interval: '6시간 간격 (1일 4회 이내)',
-      note: '실온 보관, 위장 장애 주의 (식후 투약)'
+      interval: '6시간 간격 (1일 최대 4회 이내)',
+      note: '실온 보관, 위장 장애 예방을 위해 식후 복용 권장'
     },
     {
       cat: 'fever',
       name: '해열 좌약',
       products: '복합 써스펜 좌약',
       tagClass: 'tag-red',
-      symptom: '심한 구토로 경구약(시럽) 복용 불가 시',
+      symptom: '심한 구토로 시럽 약을 계속 게워낼 때',
       staticDose: '1회 1개 직장 내 깊숙이 삽입',
-      interval: '아세트아미노펜 성분 (경구 타이레놀과 중복 투약 주의)',
-      note: '서늘한 곳 또는 냉장 보관'
+      interval: '아세트아미노펜 계열 (경구약과 중복 투약 금지)',
+      note: '녹을 수 있으므로 서늘한 곳 또는 냉장 보관'
     },
     {
       cat: 'fever',
@@ -271,155 +259,197 @@
       products: '쿨패치, 젤 시트',
       tagClass: 'tag-gray',
       symptom: '이마 쿨링, 열감 완화 보조',
-      staticDose: '이마, 겨드랑이 주변 부착',
-      interval: '피부 발진 시 즉시 떼어냄',
-      note: '해열제 복용을 대신할 수는 없으며 열감 완화 보조용'
+      staticDose: '이마 또는 목덜미에 부착',
+      interval: '피부 자극 시 즉시 제거',
+      note: '약효가 아닌 보조 쿨링 용도 (체온을 직접 떨어뜨리진 못함)'
     },
 
-    // 2. 호흡기 · 감기 · 비강 관리
+    // 2. 호흡기 · 감기 · 비강
     {
       cat: 'resp',
-      name: '비강 식염수',
+      name: '비강 멸균 식염수',
       products: '피지오머 베이비, 오트리빈 베이비',
       tagClass: 'tag-blue',
-      symptom: '코막힘, 건조한 점막 세척',
+      symptom: '코막힘, 마른 코딱지, 점막 보습',
       staticDose: '양쪽 코에 1~2회 분사 후 2~3분 뒤 흡인',
       interval: '수시로 사용 가능',
-      note: '방부제 없는 멸균 식염수'
+      note: '방부제 없는 멸균 식염수 스프레이 형태 권장'
     },
     {
       cat: 'resp',
-      name: '코 감기약',
+      name: '코 감기약 시럽',
       products: '콜대원 키즈 노즈, 코미시럽',
       tagClass: 'tag-yellow',
-      symptom: '콧물, 재채기, 코막힘',
+      symptom: '콧물, 재채기, 비염 증세',
       calcSingle: (w) => (w * 0.25).toFixed(1) + ' ~ ' + (w * 0.3).toFixed(1) + ' ml (10kg 기준 2.5~3.0ml)',
       interval: '1일 3회 식후',
-      note: '항히스타민제 함유, 졸림 유발 가능'
+      note: '항히스타민제 함유로 졸림 또는 일시적 처짐 유발 가능'
     },
     {
       cat: 'resp',
-      name: '기침 / 거담제',
+      name: '기침 · 거담 시럽',
       products: '콜대원 키즈 코프, 뮤코펙트',
       tagClass: 'tag-yellow',
       symptom: '가래 끓는 기침, 기관지염',
       calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml (10kg 기준 2.0~2.5ml)',
       interval: '1일 3회 식후',
-      note: '가래 배출을 위해 수분(미온수) 섭취를 충분히 병행'
+      note: '가래 배출을 돕기 위해 미온수를 수시로 먹여주세요'
     },
     {
       cat: 'resp',
       name: '콧물 흡입기',
       products: '노시부, 노스클린, 수동 뺑코',
       tagClass: 'tag-gray',
-      symptom: '비강 내 분비물 제거',
-      staticDose: '식염수 분사 2~3분 후 묽어진 상태에서 흡인',
-      interval: '수유 전, 취침 전 권장',
-      note: '점막 손상 방지를 위해 가장 약한 압력으로 사용'
+      symptom: '깊은 비강 내 끈적한 분비물 제거',
+      staticDose: '식염수 분사 후 묽어졌을 때 부드럽게 흡인',
+      interval: '수유 전 또는 취침 전 권장',
+      note: '점막 손상 방지를 위해 최저 압력으로 짧게 끊어서 흡인'
     },
     {
       cat: 'resp',
-      name: '네블라이저 용액',
+      name: '네블라이저 멸균 식염수',
       products: '멸균 생리식염수 앰플 (20ml)',
       tagClass: 'tag-blue',
-      symptom: '기관지 보습, 기침 발작 진정',
-      staticDose: '흡입 챔버에 2~3ml 주입 후 흡입',
-      interval: '필요 시 수회 진행',
-      note: '개봉 즉시 1회 사용 후 남은 액은 즉시 폐기'
+      symptom: '기관지 건조 완화, 기침 발작 진정',
+      staticDose: '네블라이저 챔버에 2~3ml 주입 후 흡입',
+      interval: '필요 시 하루 2~3회',
+      note: '개봉 즉시 1회 사용 후 남은 액은 세균 오염 방지를 위해 폐기'
     },
 
-    // 3. 소화기 · 장염 · 탈수 예방
+    // 3. 소화기 · 장염 · 탈수
     {
       cat: 'gut',
-      name: '경구 수액제 (전해질)',
+      name: '경구 수액제 (ORS)',
       products: '페디라산, 링티 키즈, 마시는 링거',
       tagClass: 'tag-purple',
-      symptom: '장염, 고열, 설사/구토로 인한 탈수 예방',
+      symptom: '장염, 설사, 구토, 고열 탈수 예방',
       calcSingle: (w) => '초기 4시간 권장량 약 ' + Math.round(w * 50) + ' ml (체중 × 50ml)',
-      interval: '한 번에 많이 주면 토하므로 5~10ml씩 숟가락으로 자주 섭취',
-      note: '탈수 시 맹물보다 전해질/포도당 흡수율이 우수함'
+      interval: '토하지 않도록 5~10ml씩 숟가락으로 5분마다 분할 섭취',
+      note: '탈수 시 맹물보다 체내 흡수가 훨씬 빠르고 전해질을 보충함'
     },
     {
       cat: 'gut',
       name: '유산균 정장제',
       products: '비오플 250산, 람노스산',
       tagClass: 'tag-green',
-      symptom: '설사, 변비, 장내 균총 회복',
+      symptom: '묽은 변, 설사, 장내 균총 정상화',
       staticDose: '1일 1~2포, 미온수 또는 분유에 혼합',
-      interval: '항생제 복용 시에도 함께 투약 가능 (비오플: 효모균 기반)',
-      note: '실온 보관 가능'
+      interval: '항생제 복용 중에도 함께 복용 가능 (비오플: 효모균)',
+      note: '너무 뜨거운 물에는 균이 사멸하므로 미온수에 혼합'
     },
     {
       cat: 'gut',
       name: '흡착성 지사제',
-      products: '포타겔, 디오스멕타이트',
+      products: '포타겔 현탁액, 디오스멕타이트',
       tagClass: 'tag-yellow',
-      symptom: '급성 세균/바이러스성 설사 완화',
+      symptom: '급성 바이러스/세균성 폭풍 설사 완화',
       staticDose: '1회 5ml (반 포) (1일 2~3회)',
       interval: '공복 투약 권장',
-      note: '★ 중요: 다른 약의 성분까지 흡착하므로 다른 약과 최소 1~2시간 시간 차 필수'
+      note: '★ 중요: 다른 약 성분도 흡착해 배출하므로 타 약과 최소 1~2시간 시간 차 필수'
     },
     {
       cat: 'gut',
       name: '한방 소화시럽',
       products: '백초시럽 플러스',
       tagClass: 'tag-green',
-      symptom: '급체, 소화불량, 복부 팽만, 가스',
+      symptom: '급체, 소화불량, 복부 가스 팽만',
       staticDose: '만 1세~2세 기준 1회 1.5 ~ 2.0ml',
       interval: '1일 3회 식후',
-      note: '★ 만 1세(돌) 이후부터 공식 복용 가능 (돌 전 아기는 소아과 상담)'
+      note: '★ 만 1세(돌) 이상부터 공식 복용 가능 (돌 전 영아 금지)'
+    },
+    {
+      cat: 'gut',
+      name: '유아용 관장약 (비상용)',
+      products: '베베락스액 (글리세린)',
+      tagClass: 'tag-purple',
+      symptom: '3~4일 이상 극심한 변비로 아기가 고통스러워할 때',
+      staticDose: '1회 1개(5ml)의 절반~전량을 직장에 주입',
+      interval: '습관성 방지를 위해 비상 시에만 사용',
+      note: '주입구 끝에 바셀린/로션을 살짝 바른 후 조심스럽게 삽입'
     },
 
-    // 4. 피부 · 외용 연고 · 알레르기
+    // 4. 피부 · 연고 · 알레르기
     {
       cat: 'skin',
-      name: '피부 재생제',
+      name: '피부 재생 연고',
       products: '비판텐, D-판테놀 연고',
       tagClass: 'tag-green',
-      symptom: '기저귀 발진, 침독, 열꽃 후 건조 부위',
+      symptom: '기저귀 발진, 침독, 열꽃 후 건조함',
       staticDose: '환부에 1일 수회 얇게 도포',
-      interval: '수시로 사용 가능',
-      note: '비스테로이드 성분, 영유아 일상 보습 및 재생용'
+      interval: '수시로 도포 가능',
+      note: '스테로이드 없는 안전한 덱스판테놀 성분, 일상 보습 겸용'
     },
     {
       cat: 'skin',
       name: '약한 스테로이드 연고',
       products: '리도멕스 0.15%, 락티케어 1%',
       tagClass: 'tag-red',
-      symptom: '심한 땀띠, 알레르기 두드러기, 가려움 부종',
-      staticDose: '1일 1~2회 얇게 국소 부위에만 도포',
-      interval: '3~5일 이상 연속 사용 시 의사 상담',
-      note: '물집이 터져 진물이 나거나 세균 감염된 부위에는 바르지 않음'
+      symptom: '심한 땀띠, 두드러기, 가려움성 발진',
+      staticDose: '1일 1~2회 얇게 펴 바름',
+      interval: '연속 사용은 3~5일 이내로 제한',
+      note: '물집이 터진 상처나 진물이 흐르는 세균 감염 부위에는 도포 금지'
     },
     {
       cat: 'skin',
-      name: '항생제 연고',
-      products: '에스로반, 베아로반 (무피로신)',
+      name: '무피로신 항생제 연고',
+      products: '에스로반, 베아로반',
       tagClass: 'tag-blue',
-      symptom: '긁힌 상처, 진물, 짓무름, 2차 세균 감염(농가진)',
-      staticDose: '1일 2~3회 상처 부위에 소량 도포',
-      interval: '상처 부위 청결 후 사용',
-      note: '세균 감염 예방 및 2차 덧남 방지'
+      symptom: '긁힌 상처, 진물, 짓무름, 2차 세균 감염 (농가진)',
+      staticDose: '1일 2~3회 상처 부위 소량 도포',
+      interval: '상처 세척 후 건조 상태에서 도포',
+      note: '세균 감염 예방 및 덧남 방지용 필수 항생제'
     },
     {
       cat: 'skin',
-      name: '가려움 / 벌레물림',
+      name: '가려움 / 벌레물림 외용액',
       products: '버물리 키즈, 칼라민 로션',
       tagClass: 'tag-yellow',
-      symptom: '모기/벌레 물림, 발진 가려움 완화',
+      symptom: '모기/벌레 물림, 팽진 가려움 진정',
       staticDose: '환부에 수시로 가볍게 펴 바름',
-      interval: '긁으려 할 때마다 도포',
-      note: '에탄올 없는 저자극 유아 전용 제품 확인'
+      interval: '가려워 긁으려 할 때마다 도포',
+      note: '에탄올/멘톨이 없는 순한 저자극 유아 전용 제품 사용'
     },
     {
       cat: 'skin',
-      name: '화상 응급처치',
-      products: '번스프레이, 화상 하이드로겔',
-      tagClass: 'tag-red',
-      symptom: '뜨거운 물 / 이유식 접촉 화상 응급 처치',
-      staticDose: '흐르는 미온/찬물로 15분 이상 쿨링 후 도포',
-      interval: '물집 발생 시 터뜨리지 말 것',
-      note: '물집이 생기거나 피부가 벗겨지면 즉시 화상 전문 병원 직행'
+      name: '경구 항히스타민 시럽',
+      products: '두드리진, 페니라민, 유시락스 (처방용)',
+      tagClass: 'tag-purple',
+      symptom: '전신 급성 두드러기, 음식 알레르기 가려움',
+      calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml (의사 처방 기준 준수)',
+      interval: '1일 2~3회',
+      note: '호흡 곤란이나 입술 부종(아나필락시스) 동반 시 약 먹이지 말고 즉시 응급실 직행'
+    },
+
+    // 5. 외상 · 안과 · 응급처치
+    {
+      cat: 'wound',
+      name: '저자극 무알코올 소독액',
+      products: '애니클렌액, 솔트액, 세네풀',
+      tagClass: 'tag-blue',
+      symptom: '찰과상, 넘어짐, 긁힌 상처 1차 소독',
+      staticDose: '상처 부위에 칙칙 뿌리거나 거즈에 적셔 닦아냄',
+      interval: '상처 발생 즉시',
+      note: '에탄올/과산화수소수는 피부 손상과 극심한 통증을 유발하므로 절대 사용 금지'
+    },
+    {
+      cat: 'wound',
+      name: '하이드로콜로이드 씬 밴드',
+      products: '듀오덤 엑스트라씬, 메디폼 H',
+      tagClass: 'tag-green',
+      symptom: '진물 나는 찰과상, 긁힘 흉터 예방',
+      staticDose: '상처 크기보다 1~2cm 크게 잘라 밀착 부착',
+      interval: '하얗게 부풀어 올라 진물이 샐 때까지 2~3일 유지',
+      note: '연고를 바르지 않고 소독 후 완전히 말린 맨 피부에 붙여야 잘 밀착됨'
+    },
+    {
+      cat: 'wound',
+      name: '1회용 무방부제 인공눈물',
+      products: '0.9% 염화나트륨 1회용 앰플',
+      tagClass: 'tag-blue',
+      symptom: '눈에 모래/먼지/비누 들어갔을 때, 눈곱 세척',
+      staticDose: '눈꺼풀을 살짝 벌려 눈 안쪽에서 바깥쪽으로 씻어냄',
+      interval: '이물질 접촉 즉시',
+      note: '방부제 없는 1회용 앰플로 구비, 개봉 후 남은 액은 즉시 폐기'
     }
   ];
 
@@ -477,7 +507,7 @@
             ` : ''}
             ${m.calcMax ? `
               <div class="dose-row">
-                <span class="dose-label">1일 최대 허용량:</span>
+                <span class="dose-label">1일 최대 한도:</span>
                 <span class="dose-value">${m.calcMax(weight)}</span>
               </div>
             ` : ''}
@@ -505,7 +535,7 @@
   weightInput.addEventListener('input', render);
   searchInput.addEventListener('input', render);
 
-  // 초기 렌더링
+  // 첫 실행
   render();
 </script>
 
