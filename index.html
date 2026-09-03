@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>오니의 종합 상비약 & 투약 가이드</title>
+  <title>오니의 종합 상비약 & 응급 가이드</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -14,11 +14,11 @@
       --border: #e2e8f0;
     }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); margin: 0; padding: 16px 12px 60px; color: var(--text-main); display: flex; justify-content: center; }
+    body { background-color: var(--bg); margin: 0; padding: 14px 12px 60px; color: var(--text-main); display: flex; justify-content: center; }
     .app-container { width: 100%; max-width: 480px; }
 
     /* 헤더 */
-    .header { text-align: center; margin-bottom: 16px; }
+    .header { text-align: center; margin-bottom: 14px; padding-top: 4px; }
     .header h1 { font-size: 21px; font-weight: 800; margin: 0 0 4px; color: #1e293b; letter-spacing: -0.5px; }
     .header p { font-size: 13px; color: var(--text-muted); margin: 0; }
 
@@ -28,8 +28,8 @@
       border-radius: 18px;
       padding: 16px 18px;
       color: #ffffff;
-      box-shadow: 0 6px 18px rgba(30, 41, 59, 0.15);
-      margin-bottom: 14px;
+      box-shadow: 0 6px 18px rgba(30, 41, 59, 0.2);
+      margin-bottom: 12px;
     }
     .weight-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .weight-title { font-size: 14px; font-weight: 600; opacity: 0.95; }
@@ -43,7 +43,7 @@
       font-size: 22px;
       font-weight: 800;
       text-align: right;
-      padding: 4px 6px;
+      padding: 3px 6px;
       outline: none;
     }
     .weight-input:focus { background: rgba(255, 255, 255, 0.25); border-color: #fff; }
@@ -62,6 +62,54 @@
       cursor: pointer;
     }
     .btn-step:active { background: rgba(255, 255, 255, 0.3); }
+
+    /* 해열제 교차복용 전용 공지 카드 */
+    .cross-dose-card {
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
+    }
+    .cross-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .cross-rules {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 12.5px;
+      color: #1e3a8a;
+      line-height: 1.6;
+    }
+    .cross-rules li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 4px;
+    }
+    .cross-rules li:last-child { margin-bottom: 0; }
+    .cross-rules li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      font-weight: 800;
+      color: #2563eb;
+    }
+    .warn-badge {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 11px;
+    }
 
     /* 검색창 */
     .search-box { margin-bottom: 12px; position: relative; }
@@ -87,7 +135,7 @@
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 8px 14px;
+      padding: 7px 13px;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-muted);
@@ -99,9 +147,508 @@
       border-color: #2563eb;
     }
 
-    /* 약품/처치 카드 */
+    /* 카드 */
     .card {
       background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .card-name { font-size: 15px; font-weight: 800; color: #1e293b; }
+    .card-tag { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
+    
+    .tag-red { background: #fee2e2; color: #dc2626; }
+    .tag-blue { background: #e0f2fe; color: #0284c7; }
+    .tag-yellow { background: #fef9c3; color: #a16207; }
+    .tag-green { background: #dcfce7; color: #16a34a; }
+    .tag-purple { background: #f3e8ff; color: #9333ea; }
+    .tag-orange { background: #ffedd5; color: #c2410c; }
+    .tag-gray { background: #f1f5f9; color: #475569; }
+
+    .card-symptom { font-size: 12px; color: #475569; margin-bottom: 8px; font-weight: 500; }
+    
+    .dose-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin-bottom: 8px;
+    }
+    .dose-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 3px; }
+    .dose-row:last-child { margin-bottom: 0; }
+    .dose-label { color: #64748b; }
+    .dose-value { font-weight: 800; color: #0f172a; }
+    .dose-value.highlight { color: #2563eb; font-size: 14px; }
+
+    .card-info { font-size: 11.5px; color: #64748b; line-height: 1.45; background: #fff; border-top: 1px dashed var(--border); padding-top: 8px; }
+    .card-info strong { color: #334155; }
+
+    /* 응급 박스 */
+    .emergency-box {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #742a2a;
+      line-height: 1.6;
+    }
+    .emergency-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .emergency-box h4 { margin: 0; font-size: 13px; color: #9b2c2c; }
+    .btn-119 {
+      background: #dc2626;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div class="header">
+    <h1>🍼 오니의 종합 상비약 & 투약 가이드</h1>
+    <p>체중 기반 자동 용량 계산 · 증상별 상비약 사전</p>
+  </div>
+
+  <!-- 체중 컨트롤러 -->
+  <div class="weight-card">
+    <div class="weight-top">
+      <span class="weight-title">아기 현재 체중 설정</span>
+      <div class="weight-display">
+        <input type="number" id="babyWeight" class="weight-input" value="10.0" step="0.1" inputmode="decimal">
+        <span class="weight-unit">kg</span>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn-step" onclick="changeWeight(-0.5)">- 0.5kg</button>
+      <button class="btn-step" onclick="changeWeight(-0.1)">- 0.1kg</button>
+      <button class="btn-step" onclick="changeWeight(0.1)">+ 0.1kg</button>
+      <button class="btn-step" onclick="changeWeight(0.5)">+ 0.5kg</button>
+    </div>
+  </div>
+
+  <!-- 💡 해열제 교차복용 핵심 공지 카드 (복원 및 강조) -->
+  <div class="cross-dose-card">
+    <div class="cross-title">💡 해열제 교차복용 핵심 수칙 (필독)</div>
+    <ul class="cross-rules">
+      <li><strong>교차 투약 간격:</strong> [아세트아미노펜] ↔ [덱시부/이부프로펜]은 열이 38.5°C 이상 떨어지지 않을 때만 <strong>최소 2시간 뒤</strong> 교차 복용합니다.</li>
+      <li><strong>동일 성분 재투약:</strong> 같은 계열 약은 반드시 <strong>최소 4~6시간</strong> 간격을 지켜야 합니다.</li>
+      <li><strong><span class="warn-badge">절대 교차 금지</span></strong> 맥시부펜(덱시부)과 부루펜(이부)은 <strong>동일한 NSAIDs 소염진통제 계열</strong>이므로 서로 교차 복용하면 안 됩니다!</li>
+    </ul>
+  </div>
+
+  <!-- 검색창 -->
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" class="search-input" placeholder="증상 또는 약품 검색 (예: 머리쿵, 넘어짐, 눈곱, 흉터, 변비)">
+  </div>
+
+  <!-- 탭 메뉴 -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="filterTab('all', this)">전체보기</button>
+    <button class="tab-btn" onclick="filterTab('fever', this)">1. 해열·진통</button>
+    <button class="tab-btn" onclick="filterTab('resp', this)">2. 호흡기·감기</button>
+    <button class="tab-btn" onclick="filterTab('gut', this)">3. 소화·변비·탈수</button>
+    <button class="tab-btn" onclick="filterTab('skin', this)">4. 피부·두드러기·흉터</button>
+    <button class="tab-btn" onclick="filterTab('trauma', this)">5. 넘어짐·눈곱·외상</button>
+  </div>
+
+  <div id="medicineList">
+    <!-- 동적 렌더링 영역 -->
+  </div>
+
+  <!-- 응급 5대 적신호 안내 카드 -->
+  <div class="emergency-box">
+    <div class="emergency-box-header">
+      <h4>🚨 응급실 즉시 방문 5대 적신호</h4>
+      <a href="tel:119" class="btn-119">🚨 119 연결</a>
+    </div>
+    • <strong>낙상/머리 쿵:</strong> 3회 이상 분수토, 의식이 멍하고 처지거나, 귀/코에서 맑은 액체 또는 피가 나올 때<br>
+    • <strong>급성 두드러기:</strong> 쌕쌕거리는 숨소리(천명음), 입술이나 혀가 붓거나 쉰 목소리가 날 때<br>
+    • <strong>탈수:</strong> 8시간 이상 기저귀가 마르고 울 때 눈물이 나지 않을 때<br>
+    • <strong>경련:</strong> 열과 함께 눈이 돌아가거나 사지가 뻣뻣해지며 1분 이상 떨 때
+  </div>
+
+</div>
+
+<script>
+  const meds = [
+    // 1. 해열 · 진통 · 소염
+    {
+      cat: 'fever',
+      name: '아세트아미노펜',
+      products: '타이레놀, 챔프 빨강, 콜대원 펜',
+      tagClass: 'tag-red',
+      symptom: '초기 발열, 접종열, 두통, 미열',
+      calcSingle: (w) => (w * 0.35).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml',
+      calcMax: (w) => (w * 2.3).toFixed(1) + ' ml',
+      interval: '4~6시간 간격 (1일 최대 5회 이내)',
+      note: '실온 보관, 공복 복용 가능 (위장 장애 적음)'
+    },
+    {
+      cat: 'fever',
+      name: '덱시부프로펜',
+      products: '맥시부펜, 챔프 파랑',
+      tagClass: 'tag-blue',
+      symptom: '38.5°C 이상 고열, 목 염증 (인후염)',
+      calcSingle: (w) => (w * 0.3).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml',
+      calcMax: (w) => Math.min(w * 2.4, 25).toFixed(1) + ' ml (최대 25ml)',
+      interval: '4~6시간 간격 (1일 최대 4회 이내)',
+      note: '실온 보관, 식후 복용 권장 (소염 진통 효과 우수)'
+    },
+    {
+      cat: 'fever',
+      name: '이부프로펜',
+      products: '어린이 부루펜, 콜대원 오렌지',
+      tagClass: 'tag-yellow',
+      symptom: '고열, 이앓이, 전신 통증',
+      calcSingle: (w) => (w * 0.4).toFixed(1) + ' ~ ' + (w * 0.5).toFixed(1) + ' ml',
+      calcMax: (w) => (w * 2.0).toFixed(1) + ' ml',
+      interval: '6시간 간격 (1일 최대 4회 이내)',
+      note: '실온 보관, 식후 복용 권장 (덱시부프로펜과 중복 복용 불가)'
+    },
+    {
+      cat: 'fever',
+      name: '해열 좌약',
+      products: '복합 써스펜 좌약',
+      tagClass: 'tag-red',
+      symptom: '심한 구토로 시럽 약을 계속 게워낼 때',
+      staticDose: '1회 1개 직장 내 깊숙이 삽입',
+      interval: '아세트아미노펜 계열 (경구 타이레놀과 중복 주의)',
+      note: '체온으로 녹으므로 서늘한 곳 또는 냉장 보관'
+    },
+    {
+      cat: 'fever',
+      name: '열 냉각 시트',
+      products: '쿨패치, 젤 시트',
+      tagClass: 'tag-gray',
+      symptom: '이마 쿨링, 열감 완화 보조',
+      staticDose: '이마 또는 목덜미에 부착',
+      interval: '피부 자극 시 즉시 제거',
+      note: '해열제 복용 대체 불가, 보조 쿨링용'
+    },
+
+    // 2. 호흡기 · 감기 · 비강
+    {
+      cat: 'resp',
+      name: '비강 멸균 식염수',
+      products: '피지오머 베이비, 오트리빈 베이비',
+      tagClass: 'tag-blue',
+      symptom: '코막힘, 점막 보습, 마른 코딱지 연화',
+      staticDose: '양쪽 코에 1~2회 분사 후 흡인',
+      interval: '수시로 사용 가능',
+      note: '방부제 없는 멸균 식염수 스프레이'
+    },
+    {
+      cat: 'resp',
+      name: '코 감기약 시럽',
+      products: '콜대원 키즈 노즈, 코미시럽',
+      tagClass: 'tag-yellow',
+      symptom: '콧물, 재채기, 알레르기 비염 증세',
+      calcSingle: (w) => (w * 0.25).toFixed(1) + ' ~ ' + (w * 0.3).toFixed(1) + ' ml (10kg: 2.5~3ml)',
+      interval: '1일 3회 식후',
+      note: '항히스타민제 함유로 졸림 유발 가능'
+    },
+    {
+      cat: 'resp',
+      name: '기침 · 거담 시럽',
+      products: '콜대원 키즈 코프, 뮤코펙트',
+      tagClass: 'tag-yellow',
+      symptom: '가래 끓는 기침, 기관지염',
+      calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml (10kg: 2~2.5ml)',
+      interval: '1일 3회 식후',
+      note: '가래 배출을 위해 미온수 섭취를 늘려주세요'
+    },
+    {
+      cat: 'resp',
+      name: '콧물 흡입기',
+      products: '노시부, 노스클린, 수동 뺑코',
+      tagClass: 'tag-gray',
+      symptom: '비강 깊은 곳의 끈적한 분비물 제거',
+      staticDose: '식염수 분사 후 2~3분 뒤 최저 압력으로 흡인',
+      interval: '수유 전 또는 취침 전 권장',
+      note: '점막 손상 방지를 위해 짧게 끊어서 흡인'
+    },
+    {
+      cat: 'resp',
+      name: '네블라이저 식염수',
+      products: '멸균 생리식염수 앰플 (20ml)',
+      tagClass: 'tag-blue',
+      symptom: '기관지 건조, 기침 발작 진정',
+      staticDose: '챔버에 2~3ml 주입 후 연무 흡입',
+      interval: '필요 시 하루 2~3회',
+      note: '세균 오염 방지를 위해 개봉 후 1회 사용 후 폐기'
+    },
+
+    // 3. 소화 · 변비 · 탈수
+    {
+      cat: 'gut',
+      name: '변비 치료제 (삼투성 완하제)',
+      products: '듀파락-이지시럽 (락툴로오스)',
+      tagClass: 'tag-purple',
+      symptom: '단단한 변, 배변 시 통증, 3일 이상 변비',
+      calcSingle: (w) => '초기 1일 ' + (w * 0.5).toFixed(1) + ' ml (아침 공복 또는 분유/물 혼합)',
+      interval: '1일 1회 복용 후 변 상태에 따라 조절',
+      note: '체내 흡수되지 않고 변에 수분을 끌어들이는 안전한 유아 변비약'
+    },
+    {
+      cat: 'gut',
+      name: '비상용 유아 관장약',
+      products: '베베락스액 (글리세린)',
+      tagClass: 'tag-red',
+      symptom: '극심한 변비로 복통 호소, 직장에 변이 걸려 안 나올 때',
+      staticDose: '1회 1개(5ml)의 절반~전량을 직장에 주입',
+      interval: '비상 시 1회 (습관성 방지)',
+      note: '주입구 끝에 로션을 바르고 2~3cm 조심스럽게 삽입 후 5분간 엉덩이를 모아줌'
+    },
+    {
+      cat: 'gut',
+      name: '경구 수액제 (ORS)',
+      products: '페디라산, 링티 키즈, 마시는 링거',
+      tagClass: 'tag-purple',
+      symptom: '장염, 설사, 구토, 고열 탈수 예방',
+      calcSingle: (w) => '초기 4시간 권장량 약 ' + Math.round(w * 50) + ' ml (체중 × 50ml)',
+      interval: '토하지 않도록 5~10ml씩 숟가락으로 자주 분할 섭취',
+      note: '탈수 시 맹물보다 전해질/수분 흡수가 훨씬 빠름'
+    },
+    {
+      cat: 'gut',
+      name: '유산균 정장제',
+      products: '비오플 250산, 람노스산',
+      tagClass: 'tag-green',
+      symptom: '묽은 변, 설사, 변비, 장내 균총 회복',
+      staticDose: '1일 1~2포, 미온수나 분유에 혼합',
+      interval: '항생제 복용 중에도 투약 가능 (비오플: 효모균 기반)',
+      note: '실온 보관 가능'
+    },
+    {
+      cat: 'gut',
+      name: '흡착성 지사제',
+      products: '포타겔 현탁액, 디오스멕타이트',
+      tagClass: 'tag-yellow',
+      symptom: '급성 폭풍 설사, 바이러스성 장염',
+      staticDose: '1회 5ml (반 포) (1일 2~3회)',
+      interval: '공복 복용 권장',
+      note: '★ 다른 약 성분도 흡착하므로 타 약과 최소 1~2시간 시간 차 필수'
+    },
+    {
+      cat: 'gut',
+      name: '한방 소화시럽',
+      products: '백초시럽 플러스',
+      tagClass: 'tag-green',
+      symptom: '급체, 소화불량, 복부 팽만감',
+      staticDose: '만 1세~2세 기준 1회 1.5 ~ 2.0ml',
+      interval: '1일 3회 식후',
+      note: '★ 돌(만 1세) 이후부터 공식 복용 가능'
+    },
+
+    // 4. 피부 · 두드러기 · 흉터
+    {
+      cat: 'skin',
+      name: '흉터 예방 & 치료제',
+      products: '더마틱스 울트라 키즈, 노스카나 키즈',
+      tagClass: 'tag-orange',
+      symptom: '상처 아문 후, 딱지 떨어진 직후 흉터 예방/착색 방지',
+      staticDose: '상처가 아문 뒤 1일 2회 아주 얇게 펴 바름',
+      interval: '최소 2~3개월 이상 꾸준히 도포',
+      note: '★ 진물/피가 나는 열린 상처에는 절대 금지. 외출 시 자외선 차단 필수'
+    },
+    {
+      cat: 'skin',
+      name: '급성 두드러기 항히스타민 시럽',
+      products: '두드리진, 페니라민, 유시락스 (처방용)',
+      tagClass: 'tag-purple',
+      symptom: '급성 팽진, 전신 두드러기, 음식/알레르기 가려움',
+      calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml (의사 처방 준수)',
+      interval: '1일 2~3회',
+      note: '쌕쌕거림, 입술 부종 동반 시 약 먹이지 말고 즉시 응급실 직행'
+    },
+    {
+      cat: 'skin',
+      name: '피부 재생 연고',
+      products: '비판텐, D-판테놀 연고',
+      tagClass: 'tag-green',
+      symptom: '기저귀 발진, 침독, 열꽃 후 건조함',
+      staticDose: '환부에 1일 수회 얇게 도포',
+      interval: '수시로 도포 가능',
+      note: '스테로이드 없는 안전한 성분, 일상 보습 겸용'
+    },
+    {
+      cat: 'skin',
+      name: '약한 스테로이드 연고',
+      products: '리도멕스 0.15%, 락티케어 1%',
+      tagClass: 'tag-red',
+      symptom: '심한 땀띠, 알레르기 발진, 모기 물린 붓기',
+      staticDose: '1일 1~2회 아주 얇게 국소 도포',
+      interval: '3~5일 이내로만 단기 사용',
+      note: '상처나 진물 부위에는 도포 금지'
+    },
+    {
+      cat: 'skin',
+      name: '무피로신 항생제 연고',
+      products: '에스로반, 베아로반',
+      tagClass: 'tag-blue',
+      symptom: '긁힌 상처, 진물, 짓무름, 2차 세균 감염 (농가진)',
+      staticDose: '1일 2~3회 상처 부위 소량 도포',
+      interval: '상처 청결 후 건조 상태에서 도포',
+      note: '2차 세균 감염 예방용 필수 항생제'
+    },
+    {
+      cat: 'skin',
+      name: '가려움 / 벌레물림 외용액',
+      products: '버물리 키즈, 칼라민 로션',
+      tagClass: 'tag-yellow',
+      symptom: '모기/벌레 물림, 발진 가려움 진정',
+      staticDose: '환부에 수시로 가볍게 도포',
+      interval: '가려워할 때마다 도포',
+      note: '에탄올/멘톨 없는 저자극 유아 전용 확인'
+    },
+
+    // 5. 넘어짐 · 눈곱 · 외상
+    {
+      cat: 'trauma',
+      name: '넘어짐 / 머리 쿵 / 타박상 멍 연고',
+      products: '베노플러스 겔, 타바겐 겔, 멍크림',
+      tagClass: 'tag-orange',
+      symptom: '넘어져 부딪힌 혹, 멍, 타박상 부종',
+      staticDose: '초기 24시간 냉찜질 후 환부에 1일 수회 얇게 도포',
+      interval: '상처 없는 멍 부위에만 사용',
+      note: '★ 머리를 부딪혔을 때는 멍 연고보다 [분수토/처짐/의식] 24시간 관찰이 최우선'
+    },
+    {
+      cat: 'trauma',
+      name: '눈곱 세척 & 안과 응급',
+      products: '무방부제 1회용 생리식염수 앰플',
+      tagClass: 'tag-blue',
+      symptom: '노란 눈곱, 모래/먼지 이물질 접촉, 눈 비빔',
+      staticDose: '식염수를 멸균 거즈에 적셔 눈 안쪽에서 바깥쪽으로 부드럽게 닦아냄',
+      interval: '비비지 않도록 즉시 세척',
+      note: '충혈과 노란 눈곱이 지속되면 결막염이므로 소아과/안과 진료 필요'
+    },
+    {
+      cat: 'trauma',
+      name: '저자극 무알코올 소독액',
+      products: '애니클렌액, 솔트액, 세네풀',
+      tagClass: 'tag-blue',
+      symptom: '넘어져 까진 상처, 긁힘 1차 소독',
+      staticDose: '상처에 칙칙 분사하거나 거즈로 가볍게 닦아냄',
+      interval: '상처 발생 즉시',
+      note: '에탄올이나 과산화수소수는 아기 피부 조직을 손상시키므로 금지'
+    },
+    {
+      cat: 'trauma',
+      name: '하이드로콜로이드 습윤 밴드',
+      products: '듀오덤 엑스트라씬, 메디폼 H',
+      tagClass: 'tag-green',
+      symptom: '진물 나는 찰과상, 긁힘 흉터 방지',
+      staticDose: '소독 후 완전히 건조된 맨살에 상처보다 1~2cm 크게 부착',
+      interval: '하얗게 부풀어 진물이 샐 때까지 2~3일 유지',
+      note: '연고를 바르면 밀착력이 떨어지므로 아무것도 안 바른 상태로 부착'
+    }
+  ];
+
+  let currentCategory = 'all';
+  const weightInput = document.getElementById('babyWeight');
+  const searchInput = document.getElementById('searchInput');
+  const listContainer = document.getElementById('medicineList');
+
+  function changeWeight(delta) {
+    let current = parseFloat(weightInput.value) || 10.0;
+    current = Math.max(2.0, Math.min(30.0, current + delta));
+    weightInput.value = current.toFixed(1);
+    render();
+  }
+
+  function filterTab(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function render() {
+    const weight = parseFloat(weightInput.value) || 10.0;
+    const query = searchInput.value.trim().toLowerCase();
+
+    let filtered = meds.filter(m => {
+      const matchCat = (currentCategory === 'all' || m.cat === currentCategory);
+      const matchText = (m.name + m.products + m.symptom + (m.note || '')).toLowerCase().includes(query);
+      return matchCat && matchText;
+    });
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="text-align:center; padding:40px 0; color:#94a3b8; font-size:14px;">검색 결과가 없습니다.</div>';
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(m => {
+      html += `
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <span class="card-name">${m.name}</span>
+              <span class="card-tag ${m.tagClass}">${m.products}</span>
+            </div>
+          </div>
+          <div class="card-symptom">📍 <strong>증상/목적:</strong> ${m.symptom}</div>
+          <div class="dose-box">
+            ${m.calcSingle ? `
+              <div class="dose-row">
+                <span class="dose-label">1회 권장량:</span>
+                <span class="dose-value highlight">${m.calcSingle(weight)}</span>
+              </div>
+            ` : ''}
+            ${m.calcMax ? `
+              <div class="dose-row">
+                <span class="dose-label">1일 최대 허용량:</span>
+                <span class="dose-value">${m.calcMax(weight)}</span>
+              </div>
+            ` : ''}
+            ${m.staticDose ? `
+              <div class="dose-row">
+                <span class="dose-label">용법/용량:</span>
+                <span class="dose-value highlight">${m.staticDose}</span>
+              </div>
+            ` : ''}
+            <div class="dose-row" style="margin-top:3px;">
+              <span class="dose-label">복용/사용 주기:</span>
+              <span class="dose-value" style="font-weight:600; font-size:12px;">${m.interval}</span>
+            </div>
+          </div>
+          <div class="card-info">
+            💡 <strong>핵심 가이드:</strong> ${m.note}
+          </div>
+        </div>
+      `;
+    });
+
+    listContainer.innerHTML = html;
+  }
+
+  weightInput.addEventListener('input', render);
+  searchInput.addEventListener('input', render);
+
+  // 초기 렌더링
+  render();
+</script>
+
+</body>
+</html>
       border-radius: 16px;
       border: 1px solid var(--border);
       padding: 14px 16px;
