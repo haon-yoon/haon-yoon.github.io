@@ -17,7 +17,7 @@
     body {
       background-color: var(--bg);
       margin: 0;
-      padding: 24px 16px;
+      padding: 24px 16px 40px;
       color: var(--text-main);
       display: flex;
       justify-content: center;
@@ -32,11 +32,11 @@
 
     /* 헤더 */
     .portal-header {
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .portal-icon {
-      font-size: 46px;
-      margin-bottom: 10px;
+      font-size: 44px;
+      margin-bottom: 8px;
       display: inline-block;
     }
     .portal-header h1 {
@@ -47,7 +47,7 @@
       letter-spacing: -0.5px;
     }
     .portal-header p {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--text-muted);
       margin: 0;
       line-height: 1.5;
@@ -57,50 +57,60 @@
     .mode-list {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 24px;
     }
     .mode-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
       border-radius: 20px;
-      padding: 20px 18px;
+      padding: 16px 16px;
       text-decoration: none;
       color: inherit;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       text-align: left;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
       transition: all 0.2s ease;
-      position: relative;
     }
     .mode-card:active {
       transform: scale(0.98);
       background-color: #f1f5f9;
     }
+    
+    /* 카드 개별 테마 */
     .mode-card.shared {
       border-color: #bfdbfe;
-      background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+    }
+    .mode-card.local {
+      border-color: #e2e8f0;
+      background: #ffffff;
+    }
+    .mode-card.emergency {
+      border-color: #fecaca;
+      background: linear-gradient(180deg, #ffffff 0%, #fff1f2 100%);
     }
 
     .icon-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 22px;
       flex-shrink: 0;
     }
     .icon-shared { background: #dbeafe; }
     .icon-local { background: #f1f5f9; }
+    .icon-emergency { background: #fee2e2; }
 
     .mode-info { flex: 1; }
     .mode-badge {
       display: inline-block;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
       padding: 2px 7px;
       border-radius: 6px;
@@ -108,26 +118,26 @@
     }
     .badge-cloud { background: #dcfce7; color: #15803d; }
     .badge-device { background: #e2e8f0; color: #475569; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
 
     .mode-title {
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 800;
       color: #1e293b;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     .mode-desc {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
       line-height: 1.4;
       margin: 0;
     }
     .arrow-icon {
       color: #94a3b8;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
     }
 
-    /* 하단 안내 */
     .portal-footer {
       font-size: 12px;
       color: #94a3b8;
@@ -142,36 +152,47 @@
   <div class="portal-header">
     <div class="portal-icon">🍼</div>
     <h1>오니의 스마트 케어</h1>
-    <p>상비약 용량 계산 · 교차복용 타이머 · 키즈노트<br>접속할 모드를 선택해 주세요.</p>
+    <p>상비약 용량 계산 · 교차복용 타이머 · 키즈노트<br>이용하실 모드를 선택해 주세요.</p>
   </div>
 
   <div class="mode-list">
     <!-- 1. 가족 실시간 공유 모드 -->
-    <a href="./share.html" class="mode-card shared">
+    <a href="./Y1.html" class="mode-card shared">
       <div class="icon-box icon-shared">👨‍👩‍👧</div>
       <div class="mode-info">
-        <span class="mode-badge badge-cloud">클라우드 실시간 동기화</span>
-        <div class="mode-title">실시간 전용</div>
-        <p class="mode-desc">엄마·아빠 폰끼리 투약 기록과 타이머가 즉시 공유되어 오투약을 방지합니다.</p>
+        <span class="mode-badge badge-cloud">실시간 저장용</span>
+        <div class="mode-title">실시간  전용</div>
+        <p class="mode-desc">투약 기록과 타이머가 즉시 공유됩니다.</p>
       </div>
       <div class="arrow-icon">➔</div>
     </a>
 
     <!-- 2. 내 폰 전용 로컬 모드 -->
-    <a href="./local.html" class="mode-card">
+    <a href="./Y2.html" class="mode-card local">
       <div class="icon-box icon-local">📱</div>
       <div class="mode-info">
-        <span class="mode-badge badge-device">내 기기 단독 저장</span>
+        <span class="mode-badge badge-device">휴대폰 저장용</span>
         <div class="mode-title">개인 전용</div>
-        <p class="mode-desc">외부 서버 없이 현재 스마트폰 브라우저에만 기록을 안전하게 보관합니다.</p>
+        <p class="mode-desc">내 스마트폰에만 기록을 안전하게 보관합니다.</p>
+      </div>
+      <div class="arrow-icon">➔</div>
+    </a>
+
+<!-- 3. 상비약 교차복용 가이드 (care.html) -->
+    <a href="./care.html" class="mode-card emergency" style="border-color: #fde68a; background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);">
+      <div class="icon-box" style="background: #fef3c7;">⏱️</div>
+      <div class="mode-info">
+        <span class="mode-badge" style="background: #fef3c7; color: #b45309;">단톡방 저장용</span>
+        <div class="mode-title">아기 전용</div>
+        <p class="mode-desc">단톡방 공유용 입니다.</p>
       </div>
       <div class="arrow-icon">➔</div>
     </a>
   </div>
 
   <div class="portal-footer">
-    자주 사용하는 모드는 해당 페이지 진입 후<br>
-    브라우저 메뉴에서 <strong>'홈 화면에 추가'</strong>를 해두시면 편합니다.
+    자주 쓰는 페이지는 접속 후 브라우저 메뉴에서<br>
+    <strong>'홈 화면에 추가'</strong>를 해두시면 앱처럼 편리합니다.
   </div>
 
 </div>
