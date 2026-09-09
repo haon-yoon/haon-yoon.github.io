@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>오니의 스마트 상비약 & 실시간 케어</title>
+  
+  <!-- Firebase SDK (호환 CDN 방식) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); margin: 0; padding: 14px 12px 70px; color: var(--text-main); display: flex; justify-content: center; }
+    .app-container { width: 100%; max-width: 480px; }
+
+    .header { text-align: center; margin-bottom: 12px; padding-top: 4px; }
+    .header h1 { font-size: 20px; font-weight: 800; margin: 0 0 4px; color: #1e293b; letter-spacing: -0.5px; }
+    .header p { font-size: 12px; color: var(--text-muted); margin: 0; }
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+    .sync-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
+
+    /* 체중 컨트롤러 (6버튼 모바일 최적화) */
+    .weight-card {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(30, 41, 59, 0.18);
+      margin-bottom: 12px;
+    }
+    .weight-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .weight-title { font-size: 13.5px; font-weight: 600; opacity: 0.95; }
+    .weight-display { display: flex; align-items: baseline; }
+    .weight-input {
+      width: 80px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 21px;
+      font-weight: 800;
+      text-align: right;
+      padding: 2px 6px;
+      outline: none;
+    }
+    .weight-input:focus { background: rgba(255, 255, 255, 0.25); border-color: #fff; }
+    .weight-unit { font-size: 14px; font-weight: 700; margin-left: 6px; }
+    
+    .btn-group { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+    .btn-step {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 7px 0;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .btn-step:active { background: rgba(255, 255, 255, 0.3); }
+
+    /* 메인 네비게이션 */
+    .main-nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+    }
+    .nav-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #475569;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* 해열제 수칙 공지 */
+    .cross-dose-card {
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 13px 15px;
+      margin-bottom: 12px;
+    }
+    .cross-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .cross-rules {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 12px;
+      color: #1e3a8a;
+      line-height: 1.55;
+    }
+    .cross-rules li { position: relative; padding-left: 12px; margin-bottom: 3px; }
+    .cross-rules li::before { content: "•"; position: absolute; left: 1px; font-weight: 800; color: #2563eb; }
+    .warn-badge { background: #fee2e2; color: #b91c1c; padding: 1px 5px; border-radius: 4px; font-weight: 800; font-size: 10.5px; }
+
+    /* 검색창 & 서브탭 */
+    .search-box { margin-bottom: 10px; position: relative; }
+    .search-input {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px 10px 36px;
+      font-size: 13.5px;
+      outline: none;
+      color: var(--text-main);
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #94a3b8; }
+
+    .sub-tabs { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+    .sub-tabs::-webkit-scrollbar { display: none; }
+    .sub-tab-btn {
+      white-space: nowrap;
+      border: none;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .sub-tab-btn.active { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+
+    /* 약품 카드 */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+    .card-name { font-size: 14.5px; font-weight: 800; color: #1e293b; }
+    .card-tag { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; margin-left: 6px; }
+    
+    .tag-red { background: #fee2e2; color: #dc2626; }
+    .tag-blue { background: #e0f2fe; color: #0284c7; }
+    .tag-yellow { background: #fef9c3; color: #a16207; }
+    .tag-green { background: #dcfce7; color: #16a34a; }
+    .tag-purple { background: #f3e8ff; color: #9333ea; }
+    .tag-orange { background: #ffedd5; color: #c2410c; }
+    .tag-gray { background: #f1f5f9; color: #475569; }
+
+    .card-symptom { font-size: 12px; color: #475569; margin-bottom: 7px; font-weight: 500; }
+    .dose-box { background: #f8fafc; border-radius: 10px; padding: 8px 11px; margin-bottom: 7px; }
+    .dose-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; margin-bottom: 3px; }
+    .dose-row:last-child { margin-bottom: 0; }
+    .dose-label { color: #64748b; }
+    .dose-value { font-weight: 800; color: #0f172a; }
+    .dose-value.highlight { color: #2563eb; font-size: 13.5px; }
+
+    .card-info { font-size: 11.5px; color: #64748b; line-height: 1.45; background: #fff; border-top: 1px dashed var(--border); padding-top: 7px; }
+    .card-info strong { color: #334155; }
+
+    /* 타이머 & 로그 */
+    .timer-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .btn-log {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 10px;
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .btn-log:active { transform: scale(0.98); }
+    .btn-log-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .btn-log-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .btn-log span { font-size: 11px; font-weight: 600; opacity: 0.9; }
+
+    .timer-status-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .status-header { font-size: 12.5px; font-weight: 700; color: #64748b; margin-bottom: 8px; }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+    }
+    .status-item:last-child { border-bottom: none; }
+    .status-badge { font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+    .badge-ok { background: #dcfce7; color: #16a34a; }
+    .badge-wait { background: #fee2e2; color: #dc2626; }
+
+    .log-list-title { font-size: 13px; font-weight: 800; color: #334155; margin: 12px 0 6px; }
+    .log-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .log-item-time { color: var(--text-muted); font-size: 11px; }
+    .btn-delete { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px; padding: 2px 5px; }
+
+    /* 개봉일 & 키즈노트 */
+    .pao-form, .kids-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .form-group { margin-bottom: 11px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; }
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pao-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 13px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 키즈노트 퀵 칩 & 추천 배지 스타일 */
+    .quick-chips-wrapper {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding: 4px 0 8px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .quick-chips-wrapper::-webkit-scrollbar { display: none; }
+    .med-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .med-chip:active { background: #e2e8f0; }
+
+    .auto-dose-hint {
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: #2563eb;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .auto-dose-hint:hover { text-decoration: underline; }
+
+    .preview-box {
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin: 12px 0;
+    }
+    .btn-copy {
+      width: 100%;
+      background: #059669;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* 응급 박스 */
+    .emergency-box {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 14px;
+      padding: 13px;
+      margin-top: 18px;
+      font-size: 11.5px;
+      color: #742a2a;
+      line-height: 1.55;
+    }
+    .emergency-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .emergency-box h4 { margin: 0; font-size: 12.5px; color: #9b2c2c; }
+    .btn-119 {
+      background: #dc2626;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* 토스트 */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      color: white;
+      padding: 9px 16px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div class="header">
+    <h1>🍼 오니의 스마트 상비약 & 케어</h1>
+    <div class="sync-badge"><span class="sync-dot"></span> 가족 실시간 클라우드 동기화 중</div>
+  </div>
+
+  <!-- 공통 체중 컨트롤러 (Firebase 실시간 연동) -->
+  <div class="weight-card">
+    <div class="weight-top">
+      <span class="weight-title">오니의 현재 체중</span>
+      <div class="weight-display">
+        <input type="number" id="babyWeight" class="weight-input" value="10.0" step="0.1" inputmode="decimal">
+        <span class="weight-unit">kg</span>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn-step" onclick="changeWeight(-1.0)">- 1.0kg</button>
+      <button class="btn-step" onclick="changeWeight(-0.5)">- 0.5kg</button>
+      <button class="btn-step" onclick="changeWeight(-0.1)">- 0.1kg</button>
+      <button class="btn-step" onclick="changeWeight(0.1)">+ 0.1kg</button>
+      <button class="btn-step" onclick="changeWeight(0.5)">+ 0.5kg</button>
+      <button class="btn-step" onclick="changeWeight(1.0)">+ 1.0kg</button>
+    </div>
+  </div>
+
+  <!-- 메인 네비게이션 -->
+  <div class="main-nav">
+    <button class="nav-btn active" onclick="switchView('dict', this)">💊 상비약 사전</button>
+    <button class="nav-btn" onclick="switchView('timer', this)">⏱️ 교차 타이머</button>
+    <button class="nav-btn" onclick="switchView('pao', this)">📅 개봉일 관리</button>
+    <button class="nav-btn" onclick="switchView('kids', this)">📝 키즈노트</button>
+  </div>
+
+  <!-- VIEW 1: 상비약 사전 -->
+  <div id="view-dict" class="view-section active">
+    <div class="cross-dose-card">
+      <div class="cross-title">💡 해열제 교차복용 핵심 수칙</div>
+      <ul class="cross-rules">
+        <li><strong>교차 간격:</strong> [아세트] ↔ [덱시/이부]는 38.5°C 지속 시 <strong>최소 2시간 뒤</strong> 복용.</li>
+        <li><strong>동일 성분 재투약:</strong> 같은 계열은 <strong>최소 4~6시간</strong> 간격 준수.</li>
+        <li><strong><span class="warn-badge">교차 금지</span></strong> 맥시부펜(덱시부)과 부루펜(이부)은 <strong>동일 계열</strong>이므로 교차 금지!</li>
+      </ul>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="증상 또는 약품 검색 (예: 머리쿵, 넘어짐, 눈곱, 변비)">
+    </div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab-btn active" onclick="filterTab('all', this)">전체보기</button>
+      <button class="sub-tab-btn" onclick="filterTab('fever', this)">1. 해열·진통</button>
+      <button class="sub-tab-btn" onclick="filterTab('resp', this)">2. 호흡기·감기</button>
+      <button class="sub-tab-btn" onclick="filterTab('gut', this)">3. 소화·변비·탈수</button>
+      <button class="sub-tab-btn" onclick="filterTab('skin', this)">4. 피부·두드러기·흉터</button>
+      <button class="sub-tab-btn" onclick="filterTab('trauma', this)">5. 넘어짐·눈곱·외상</button>
+    </div>
+
+    <div id="medicineList"></div>
+  </div>
+
+  <!-- VIEW 2: 실시간 교차 타이머 & 로그 -->
+  <div id="view-timer" class="view-section">
+    <div class="timer-action-grid">
+      <button class="btn-log btn-log-red" onclick="logDoseFirebase('아세트아미노펜', 'red')">
+        🔴 아세트 투약 완료
+        <span id="red-quick-dose">1회 4.0ml 권장</span>
+      </button>
+      <button class="btn-log btn-log-blue" onclick="logDoseFirebase('덱시부/이부프로펜', 'blue')">
+        🔵 덱시부/이부 투약 완료
+        <span id="blue-quick-dose">1회 3.5ml 권장</span>
+      </button>
+    </div>
+
+    <div class="timer-status-box">
+      <div class="status-header">⏱️ 다음 투약 가능 시각 (가족 실시간 동기화)</div>
+      <div class="status-item">
+        <div>
+          <strong>🔴 아세트아미노펜 계열</strong><br>
+          <span style="font-size:11px; color:#64748b;" id="acet-target-time">투약 기록 대기 중</span>
+        </div>
+        <span class="status-badge badge-ok" id="acet-badge">지금 가능</span>
+      </div>
+      <div class="status-item">
+        <div>
+          <strong>🔵 덱시부/이부프로펜 계열</strong><br>
+          <span style="font-size:11px; color:#64748b;" id="ibu-target-time">투약 기록 대기 중</span>
+        </div>
+        <span class="status-badge badge-ok" id="ibu-badge">지금 가능</span>
+      </div>
+    </div>
+
+    <div class="log-list-title">📋 최근 투약 일지 (실시간 공유)</div>
+    <div id="doseLogList"></div>
+  </div>
+
+  <!-- VIEW 3: 개봉일 D-Day 관리 -->
+  <div id="view-pao" class="view-section">
+    <div class="pao-form">
+      <div class="form-group">
+        <label>약품 선택 또는 직접 입력</label>
+        <input type="text" id="paoMedName" class="form-control" placeholder="예: 맥시부펜 시럽, 콜대원 노즈" list="allMedOptions">
+      </div>
+      <div class="form-group">
+        <label>개봉일자</label>
+        <input type="date" id="paoDate" class="form-control">
+      </div>
+      <button class="btn-primary" onclick="addPaoFirebase()">+ 개봉 약품 등록</button>
+    </div>
+
+    <div class="log-list-title">📦 보관 중인 상비약 유효기간 현황</div>
+    <div id="paoList"></div>
+  </div>
+
+  <!-- VIEW 4: 키즈노트 투약의뢰서 (검색 & 퀵버튼 탑재) -->
+  <div id="view-kids" class="view-section">
+    <div class="kids-card">
+      
+      <!-- 자주 보내는 상비약 퀵 칩 -->
+      <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 5px;">⚡ 자주 보내는 약 원클릭 선택</label>
+      <div class="quick-chips-wrapper">
+        <button class="med-chip" onclick="quickSelectKidMed('콜대원 키즈 노즈 시럽')">🤧 코감기 시럽</button>
+        <button class="med-chip" onclick="quickSelectKidMed('콜대원 키즈 코프 시럽')">🗣️ 기침가래 시럽</button>
+        <button class="med-chip" onclick="quickSelectKidMed('맥시부펜 시럽 (덱시부)')">🔵 맥시부펜</button>
+        <button class="med-chip" onclick="quickSelectKidMed('챔프 시럽 (빨강 - 아세트)')">🔴 챔프 빨강</button>
+        <button class="med-chip" onclick="quickSelectKidMed('두드리진 시럽 (항히스타민)')">🟣 두드러기약</button>
+        <button class="med-chip" onclick="quickSelectKidMed('비오플 250산 (유산균)')">🟢 비오플 유산균</button>
+      </div>
+
+      <div class="form-group" style="margin-top: 8px;">
+        <label>투약할 약품 (검색 또는 직접 입력)</label>
+        <input type="text" id="knMed" class="form-control" placeholder="약품 검색 (예: 콜대원, 맥시부펜, 비오플)" list="allMedOptions" oninput="onKnMedInput()">
+      </div>
+
+      <div class="form-group">
+        <label>1회 투약 용량</label>
+        <input type="text" id="knDose" class="form-control" placeholder="예: 2.5ml" oninput="updateKidsNote()">
+        <div id="knDoseHint" class="auto-dose-hint" style="display:none;" onclick="applySuggestedDose()"></div>
+      </div>
+
+      <div class="form-group">
+        <label>투약 희망 시간</label>
+        <select id="knTime" class="form-control" onchange="updateKidsNote()">
+          <option value="점심 식사 직후 (12:00 ~ 12:30)">점심 식사 직후 (12:00 ~ 12:30)</option>
+          <option value="오전 낮잠 전 (10:30)">오전 낮잠 전 (10:30)</option>
+          <option value="오후 간식 후 (15:00)">오후 간식 후 (15:00)</option>
+          <option value="열이 38.0°C 이상 오를 때만 비상 투약">열이 38.0°C 이상 오를 때만 비상 투약</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>보관 방법</label>
+        <select id="knStorage" class="form-control" onchange="updateKidsNote()">
+          <option value="실온 보관">실온 보관 (가방 앞주머니 보관)</option>
+          <option value="냉장 보관">냉장 보관 (원 원아용 냉장고 보관 부탁드립니다)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>선생님께 전달할 추가 메모</label>
+        <input type="text" id="knMemo" class="form-control" placeholder="예: 투약 전 충분히 흔들어 먹여주세요" oninput="updateKidsNote()">
+      </div>
+
+      <div class="preview-box" id="knPreview">양식을 작성하시면 텍스트가 자동 완성됩니다.</div>
+      <button class="btn-copy" onclick="copyKidsNote()">📋 클립보드에 복사</button>
+    </div>
+  </div>
+
+  <!-- 응급 적신호 카드 -->
+  <div class="emergency-box">
+    <div class="emergency-box-header">
+      <h4>🚨 응급실 즉시 방문 5대 적신호</h4>
+      <a href="tel:119" class="btn-119">🚨 119 연결</a>
+    </div>
+    • <strong>낙상/머리 쿵:</strong> 3회 이상 분수토, 의식이 처지거나 코/귀에서 맑은 액체·피가 나올 때[cite: 1]<br>
+    • <strong>급성 두드러기:</strong> 쌕쌕거리는 숨소리(천명음), 입술/혀 부종 및 쉰 목소리 동반 시[cite: 1]<br>
+    • <strong>탈수:</strong> 8시간 이상 기저귀가 마르고 울 때 눈물이 나지 않을 때[cite: 1]<br>
+    • <strong>경련:</strong> 열과 함께 눈이 돌아가고 사지가 뻣뻣해지며 1분 이상 떨 때[cite: 1]
+  </div>
+
+</div>
+
+<!-- 전체 약품 자동완성 데이터리스트 -->
+<datalist id="allMedOptions"></datalist>
+
+<div id="toast" class="toast">메시지</div>
+
+<script>
+  // ================= 1. FIREBASE 연동 설정 =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZw7aA7jbLPu6g1eksNY9MmG2_No9KaXc",
+    authDomain: "haon-care.firebaseapp.com",
+    databaseURL: "https://haon-care-default-rtdb.firebaseio.com",
+    projectId: "haon-care",
+    storageBucket: "haon-care.firebasestorage.app",
+    messagingSenderId: "268706206251",
+    appId: "1:268706206251:web:6b9b17fc90e94a896b106e"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // ================= 2. 원본 상비약 데이터베이스 =================
+  const meds = [
+    { cat: 'fever', name: '아세트아미노펜', products: '타이레놀, 챔프 빨강, 콜대원 펜', tagClass: 'tag-red', symptom: '초기 발열, 접종열, 두통, 미열', calcSingle: (w) => (w * 0.35).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml', calcMax: (w) => (w * 2.3).toFixed(1) + ' ml', interval: '4~6시간 간격 (1일 최대 5회 이내)', note: '실온 보관, 공복 복용 가능 (위장 장애 적음)' },
+    { cat: 'fever', name: '덱시부프로펜', products: '맥시부펜, 챔프 파랑', tagClass: 'tag-blue', symptom: '38.5°C 이상 고열, 목 염증 (인후염)', calcSingle: (w) => (w * 0.3).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml', calcMax: (w) => Math.min(w * 2.4, 25).toFixed(1) + ' ml (최대 25ml)', interval: '4~6시간 간격 (1일 최대 4회 이내)', note: '실온 보관, 식후 복용 권장 (소염 진통 효과 우수)' },
+    { cat: 'fever', name: '이부프로펜', products: '어린이 부루펜, 콜대원 오렌지', tagClass: 'tag-yellow', symptom: '고열, 이앓이, 전신 통증', calcSingle: (w) => (w * 0.4).toFixed(1) + ' ~ ' + (w * 0.5).toFixed(1) + ' ml', calcMax: (w) => (w * 2.0).toFixed(1) + ' ml', interval: '6시간 간격 (1일 최대 4회 이내)', note: '실온 보관, 식후 복용 권장 (덱시부프로펜과 중복 복용 불가)' },
+    { cat: 'fever', name: '해열 좌약', products: '복합 써스펜 좌약', tagClass: 'tag-red', symptom: '심한 구토로 시럽 약을 계속 게워낼 때', staticDose: '1회 1개 직장 내 깊숙이 삽입', interval: '아세트아미노펜 계열 (경구 타이레놀과 중복 주의)', note: '체온으로 녹으므로 서늘한 곳 또는 냉장 보관' },
+    { cat: 'fever', name: '열 냉각 시트', products: '쿨패치, 젤 시트', tagClass: 'tag-gray', symptom: '이마 쿨링, 열감 완화 보조', staticDose: '이마 또는 목덜미에 부착', interval: '피부 자극 시 즉시 제거', note: '해열제 복용 대체 불가, 보조 쿨링용' },
+    { cat: 'resp', name: '비강 멸균 식염수', products: '피지오머 베이비, 오트리빈 베이비', tagClass: 'tag-blue', symptom: '코막힘, 점막 보습, 마른 코딱지 연화', staticDose: '양쪽 코에 1~2회 분사 후 흡인', interval: '수시로 사용 가능', note: '방부제 없는 멸균 식염수 스프레이' },
+    { cat: 'resp', name: '코 감기약 시럽', products: '콜대원 키즈 노즈, 코미시럽', tagClass: 'tag-yellow', symptom: '콧물, 재채기, 알레르기 비염 증세', calcSingle: (w) => (w * 0.25).toFixed(1) + ' ~ ' + (w * 0.3).toFixed(1) + ' ml', interval: '1일 3회 식후', note: '항히스타민제 함유로 졸림 유발 가능' },
+    { cat: 'resp', name: '기침 · 거담 시럽', products: '콜대원 키즈 코프, 뮤코펙트', tagClass: 'tag-yellow', symptom: '가래 끓는 기침, 기관지염', calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml', interval: '1일 3회 식후', note: '가래 배출을 위해 미온수 섭취를 늘려주세요' },
+    { cat: 'resp', name: '콧물 흡입기', products: '노시부, 노스클린, 수동 뺑코', tagClass: 'tag-gray', symptom: '비강 깊은 곳의 끈적한 분비물 제거', staticDose: '식염수 분사 후 2~3분 뒤 최저 압력으로 흡인', interval: '수유 전 또는 취침 전 권장', note: '점막 손상 방지를 위해 짧게 끊어서 흡인' },
+    { cat: 'resp', name: '네블라이저 식염수', products: '멸균 생리식염수 앰플 (20ml)', tagClass: 'tag-blue', symptom: '기관지 건조, 기침 발작 진정', staticDose: '챔버에 2~3ml 주입 후 연무 흡입', interval: '필요 시 하루 2~3회', note: '세균 오염 방지를 위해 개봉 후 1회 사용 후 폐기' },
+    { cat: 'gut', name: '변비 치료제 (삼투성 완하제)', products: '듀파락-이지시럽 (락툴로오스)', tagClass: 'tag-purple', symptom: '단단한 변, 배변 시 통증, 3일 이상 변비', calcSingle: (w) => '초기 1일 ' + (w * 0.5).toFixed(1) + ' ml', interval: '1일 1회 복용 후 변 상태에 따라 조절', note: '체내 흡수되지 않고 변에 수분을 끌어들이는 안전한 유아 변비약' },
+    { cat: 'gut', name: '비상용 유아 관장약', products: '베베락스액 (글리세린)', tagClass: 'tag-red', symptom: '극심한 변비로 복통 호소, 직장에 변이 걸려 안 나올 때', staticDose: '1회 1개(5ml)의 절반~전량을 직장에 주입', interval: '비상 시 1회 (습관성 방지)', note: '주입구 끝에 로션을 바르고 2~3cm 조심스럽게 삽입 후 5분간 엉덩이를 모아줌' },
+    { cat: 'gut', name: '경구 수액제 (ORS)', products: '페디라산, 링티 키즈, 마시는 링거', tagClass: 'tag-purple', symptom: '장염, 설사, 구토, 고열 탈수 예방', calcSingle: (w) => '초기 4시간 약 ' + Math.round(w * 50) + ' ml', interval: '토하지 않도록 5~10ml씩 숟가락으로 자주 분할 섭취', note: '탈수 시 맹물보다 전해질/수분 흡수가 훨씬 빠름' },
+    { cat: 'gut', name: '유산균 정장제', products: '비오플 250산, 람노스산', tagClass: 'tag-green', symptom: '묽은 변, 설사, 변비, 장내 균총 회복', staticDose: '1일 1~2포, 미온수나 분유에 혼합', interval: '항생제 복용 중에도 투약 가능 (비오플: 효모균 기반)', note: '실온 보관 가능' },
+    { cat: 'gut', name: '흡착성 지사제', products: '포타겔 현탁액, 디오스멕타이트', tagClass: 'tag-yellow', symptom: '급성 폭풍 설사, 바이러스성 장염', staticDose: '1회 5ml (반 포) (1일 2~3회)', interval: '공복 복용 권장', note: '★ 다른 약 성분도 흡착하므로 타 약과 최소 1~2시간 시간 차 필수' },
+    { cat: 'gut', name: '한방 소화시럽', products: '백초시럽 플러스', tagClass: 'tag-green', symptom: '급체, 소화불량, 복부 팽만감', staticDose: '만 1세~2세 기준 1회 1.5 ~ 2.0ml', interval: '1일 3회 식후', note: '★ 돌(만 1세) 이후부터 공식 복용 가능' },
+    { cat: 'skin', name: '흉터 예방 & 치료제', products: '더마틱스 울트라 키즈, 노스카나 키즈', tagClass: 'tag-orange', symptom: '상처 아문 후, 딱지 떨어진 직후 흉터 예방/착색 방지', staticDose: '상처가 아문 뒤 1일 2회 아주 얇게 펴 바름', interval: '최소 2~3개월 이상 꾸준히 도포', note: '★ 진물/피가 나는 열린 상처에는 절대 금지. 외출 시 자외선 차단 필수' },
+    { cat: 'skin', name: '급성 두드러기 항히스타민 시럽', products: '두드리진, 페니라민, 유시락스', tagClass: 'tag-purple', symptom: '급성 팽진, 전신 두드러기, 음식/알레르기 가려움', calcSingle: (w) => (w * 0.2).toFixed(1) + ' ~ ' + (w * 0.25).toFixed(1) + ' ml', interval: '1일 2~3회', note: '쌕쌕거림, 입술 부종 동반 시 약 먹이지 말고 즉시 응급실 직행' },
+    { cat: 'skin', name: '피부 재생 연고', products: '비판텐, D-판테놀 연고', tagClass: 'tag-green', symptom: '기저귀 발진, 침독, 열꽃 후 건조함', staticDose: '환부에 1일 수회 얇게 도포', interval: '수시로 도포 가능', note: '스테로이드 없는 안전한 성분, 일상 보습 겸용' },
+    { cat: 'skin', name: '약한 스테로이드 연고', products: '리도멕스 0.15%, 락티케어 1%', tagClass: 'tag-red', symptom: '심한 땀띠, 알레르기 발진, 모기 물린 붓기', staticDose: '1일 1~2회 아주 얇게 국소 도포', interval: '3~5일 이내로만 단기 사용', note: '상처나 진물 부위에는 도포 금지' },
+    { cat: 'skin', name: '무피로신 항생제 연고', products: '에스로반, 베아로반', tagClass: 'tag-blue', symptom: '긁힌 상처, 진물, 짓무름, 2차 세균 감염 (농가진)', staticDose: '1일 2~3회 상처 부위 소량 도포', interval: '상처 청결 후 건조 상태에서 도포', note: '2차 세균 감염 예방용 필수 항생제' },
+    { cat: 'skin', name: '가려움 / 벌레물림 외용액', products: '버물리 키즈, 칼라민 로션', tagClass: 'tag-yellow', symptom: '모기/벌레 물림, 발진 가려움 진정', staticDose: '환부에 수시로 가볍게 도포', interval: '가려워할 때마다 도포', note: '에탄올/멘톨 없는 저자극 유아 전용 확인' },
+    { cat: 'trauma', name: '넘어짐 / 머리 쿵 / 타박상 멍 연고', products: '베노플러스 겔, 타바겐 겔, 멍크림', tagClass: 'tag-orange', symptom: '넘어져 부딪힌 혹, 멍, 타박상 부종', staticDose: '초기 24시간 냉찜질 후 환부에 1일 수회 얇게 도포', interval: '상처 없는 멍 부위에만 사용', note: '★ 머리를 부딪혔을 때는 멍 연고보다 [분수토/처짐/의식] 24시간 관찰이 최우선' },
+    { cat: 'trauma', name: '눈곱 세척 & 안과 응급', products: '무방부제 1회용 생리식염수 앰플', tagClass: 'tag-blue', symptom: '노란 눈곱, 모래/먼지 이물질 접촉, 눈 비빔', staticDose: '식염수를 멸균 거즈에 적셔 눈 안쪽에서 바깥쪽으로 부드럽게 닦아냄', interval: '비비지 않도록 즉시 세척', note: '충혈과 노란 눈곱이 지속되면 결막염이므로 소아과/안과 진료 필요' },
+    { cat: 'trauma', name: '저자극 무알코올 소독액', products: '애니클렌액, 솔트액, 세네풀', tagClass: 'tag-blue', symptom: '넘어져 까진 상처, 긁힘 1차 소독', staticDose: '상처에 칙칙 분사하거나 거즈로 가볍게 닦아냄', interval: '상처 발생 즉시', note: '에탄올이나 과산화수소수는 아기 피부 조직을 손상시키므로 금지' },
+    { cat: 'trauma', name: '하이드로콜로이드 습윤 밴드', products: '듀오덤 엑스트라씬, 메디폼 H', tagClass: 'tag-green', symptom: '진물 나는 찰과상, 긁힘 흉터 방지', staticDose: '소독 후 완전히 건조된 맨살에 상처보다 1~2cm 크게 부착', interval: '하얗게 부풀어 진물이 샐 때까지 2~3일 유지', note: '연고를 바르면 밀착력이 떨어지므로 아무것도 안 바른 상태로 부착' }
+  ];
+
+  let currentCategory = 'all';
+  let sharedLogs = [];
+  let sharedPao = [];
+  let currentSuggestedDose = '';
+
+  const weightInput = document.getElementById('babyWeight');
+  const searchInput = document.getElementById('searchInput');
+  const listContainer = document.getElementById('medicineList');
+
+  // 자동완성 데이터리스트 초기화
+  function initMedDatalist() {
+    const dl = document.getElementById('allMedOptions');
+    let opts = '';
+    meds.forEach(m => {
+      opts += `<option value="${m.name}">${m.products}</option>`;
+      m.products.split(',').forEach(p => {
+        const item = p.trim();
+        if (item) opts += `<option value="${item}">${m.name} 계열</option>`;
+      });
+    });
+    dl.innerHTML = opts;
+  }
+  initMedDatalist();
+
+  // ================= 3. FIREBASE 실시간 동기화 리스너 =================
+  db.ref('baby_weight').on('value', snapshot => {
+    const val = snapshot.val();
+    if (val) {
+      weightInput.value = parseFloat(val).toFixed(1);
+      render();
+      updateTimerView();
+      onKnMedInput();
+      updateKidsNote();
+    }
+  });
+
+  db.ref('dose_logs').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    sharedLogs = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    sharedLogs.sort((a, b) => new Date(b.time) - new Date(a.time));
+    updateTimerView();
+  });
+
+  db.ref('pao_items').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    sharedPao = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    sharedPao.sort((a, b) => new Date(b.date) - new Date(a.date));
+    renderPaoList();
+  });
+
+  function changeWeight(delta) {
+    let current = parseFloat(weightInput.value) || 10.0;
+    current = Math.max(2.0, Math.min(30.0, current + delta));
+    const finalVal = current.toFixed(1);
+    weightInput.value = finalVal;
+    db.ref('baby_weight').set(finalVal);
+    render();
+    updateTimerView();
+    onKnMedInput();
+    updateKidsNote();
+  }
+
+  weightInput.addEventListener('input', () => {
+    db.ref('baby_weight').set(weightInput.value);
+    render();
+    updateTimerView();
+    onKnMedInput();
+    updateKidsNote();
+  });
+
+  function switchView(viewName, btn) {
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + viewName).classList.add('active');
+    btn.classList.add('active');
+
+    if (viewName === 'timer') updateTimerView();
+    if (viewName === 'pao') renderPaoList();
+    if (viewName === 'kids') {
+      onKnMedInput();
+      updateKidsNote();
+    }
+  }
+
+  function filterTab(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  // 상비약 카드 렌더링
+  function render() {
+    const weight = parseFloat(weightInput.value) || 10.0;
+    const query = searchInput.value.trim().toLowerCase();
+
+    let filtered = meds.filter(m => {
+      const matchCat = (currentCategory === 'all' || m.cat === currentCategory);
+      const matchText = (m.name + m.products + m.symptom + (m.note || '')).toLowerCase().includes(query);
+      return matchCat && matchText;
+    });
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="text-align:center; padding:40px 0; color:#94a3b8; font-size:13px;">검색 결과가 없습니다.</div>';
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(m => {
+      html += `
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <span class="card-name">${m.name}</span>
+              <span class="card-tag ${m.tagClass}">${m.products}</span>
+            </div>
+          </div>
+          <div class="card-symptom">📍 <strong>증상/목적:</strong> ${m.symptom}</div>
+          <div class="dose-box">
+            ${m.calcSingle ? `
+              <div class="dose-row">
+                <span class="dose-label">1회 권장량:</span>
+                <span class="dose-value highlight">${m.calcSingle(weight)}</span>
+              </div>
+            ` : ''}
+            ${m.calcMax ? `
+              <div class="dose-row">
+                <span class="dose-label">1일 최대 허용량:</span>
+                <span class="dose-value">${m.calcMax(weight)}</span>
+              </div>
+            ` : ''}
+            ${m.staticDose ? `
+              <div class="dose-row">
+                <span class="dose-label">용법/용량:</span>
+                <span class="dose-value highlight">${m.staticDose}</span>
+              </div>
+            ` : ''}
+            <div class="dose-row" style="margin-top:3px;">
+              <span class="dose-label">복용/사용 주기:</span>
+              <span class="dose-value" style="font-weight:600; font-size:12px;">${m.interval}</span>
+            </div>
+          </div>
+          <div class="card-info">
+            💡 <strong>핵심 가이드:</strong> ${m.note}
+          </div>
+        </div>
+      `;
+    });
+    listContainer.innerHTML = html;
+  }
+  searchInput.addEventListener('input', render);
+
+  // ================= 4. 실시간 타이머 및 투약 기록 =================
+  function logDoseFirebase(type, colorKey) {
+    const weight = parseFloat(weightInput.value) || 10.0;
+    const doseAmount = colorKey === 'red' 
+      ? (weight * 0.4).toFixed(1) + 'ml' 
+      : (weight * 0.35).toFixed(1) + 'ml';
+
+    const newLog = {
+      type: type,
+      colorKey: colorKey,
+      time: new Date().toISOString(),
+      dose: doseAmount
+    };
+
+    db.ref('dose_logs').push(newLog);
+    showToast(`${type} (${doseAmount}) 클라우드 기록 완료!`);
+  }
+
+  function deleteLogFirebase(id) {
+    if (confirm('이 기록을 삭제하시겠습니까? (가족 전체 화면에서 실시간 삭제됩니다)')) {
+      db.ref('dose_logs/' + id).remove();
+    }
+  }
+
+  function updateTimerView() {
+    const weight = parseFloat(weightInput.value) || 10.0;
+    document.getElementById('red-quick-dose').textContent = `1회 ${(weight * 0.4).toFixed(1)}ml 권장`;
+    document.getElementById('blue-quick-dose').textContent = `1회 ${(weight * 0.35).toFixed(1)}ml 권장`;
+
+    const now = new Date();
+    const lastRed = sharedLogs.find(l => l.colorKey === 'red');
+    const lastBlue = sharedLogs.find(l => l.colorKey === 'blue');
+
+    evaluateNextDose('acet', lastRed, lastBlue, now);
+    evaluateNextDose('ibu', lastBlue, lastRed, now);
+
+    const logList = document.getElementById('doseLogList');
+    if (sharedLogs.length === 0) {
+      logList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">기록된 투약 내역이 없습니다.</div>';
+      return;
+    }
+
+    let html = '';
+    sharedLogs.slice(0, 15).forEach(l => {
+      const d = new Date(l.time);
+      const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      html += `
+        <div class="log-item">
+          <div>
+            <strong>${l.colorKey === 'red' ? '🔴' : '🔵'} ${l.type}</strong> 
+            <span style="color:#2563eb; font-weight:700; margin-left:4px;">${l.dose}</span>
+            <div class="log-item-time">${timeStr} 투약</div>
+          </div>
+          <button class="btn-delete" onclick="deleteLogFirebase('${l.id}')">✕</button>
+        </div>
+      `;
+    });
+    logList.innerHTML = html;
+  }
+
+  function evaluateNextDose(targetType, sameLast, otherLast, now) {
+    let sameTargetTime = sameLast ? new Date(new Date(sameLast.time).getTime() + 4 * 60 * 60 * 1000) : null;
+    let crossTargetTime = otherLast ? new Date(new Date(otherLast.time).getTime() + 2 * 60 * 60 * 1000) : null;
+
+    let targetTime = null;
+    if (sameTargetTime && crossTargetTime) {
+      targetTime = new Date(Math.max(sameTargetTime, crossTargetTime));
+    } else {
+      targetTime = sameTargetTime || crossTargetTime;
+    }
+
+    const timeLabel = document.getElementById(`${targetType}-target-time`);
+    const badge = document.getElementById(`${targetType}-badge`);
+
+    if (!targetTime || now >= targetTime) {
+      timeLabel.textContent = '현재 복용 가능';
+      badge.textContent = '지금 가능';
+      badge.className = 'status-badge badge-ok';
+    } else {
+      const diffMs = targetTime - now;
+      const diffMin = Math.ceil(diffMs / (1000 * 60));
+      const hours = Math.floor(diffMin / 60);
+      const mins = diffMin % 60;
+      const hourStr = targetTime.getHours().toString().padStart(2, '0');
+      const minStr = targetTime.getMinutes().toString().padStart(2, '0');
+      
+      timeLabel.textContent = `${hourStr}:${minStr} 이후 (${hours > 0 ? hours + '시간 ' : ''}${mins}분 대기)`;
+      badge.textContent = '대기 필요';
+      badge.className = 'status-badge badge-wait';
+    }
+  }
+
+  // ================= 5. 개봉일 D-Day 관리 =================
+  function addPaoFirebase() {
+    const name = document.getElementById('paoMedName').value.trim();
+    const date = document.getElementById('paoDate').value;
+    if (!name || !date) {
+      alert('약품명과 개봉일을 입력해 주세요.');
+      return;
+    }
+    db.ref('pao_items').push({ name: name, date: date });
+    document.getElementById('paoMedName').value = '';
+    showToast('개봉 약품이 클라우드에 등록되었습니다.');
+  }
+
+  function deletePaoFirebase(id) {
+    db.ref('pao_items/' + id).remove();
+  }
+
+  function renderPaoList() {
+    const container = document.getElementById('paoList');
+    if (sharedPao.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">등록된 개봉 상비약이 없습니다.</div>';
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    let html = '';
+    sharedPao.forEach(item => {
+      const opened = new Date(item.date);
+      opened.setHours(0,0,0,0);
+      const diffDays = Math.floor((today - opened) / (1000 * 60 * 60 * 24));
+      
+      let badgeHtml = '';
+      if (diffDays > 28) {
+        badgeHtml = `<span class="status-badge badge-wait">⚠️ 폐기 권고 (D+${diffDays}일)</span>`;
+      } else if (diffDays >= 21) {
+        badgeHtml = `<span class="status-badge" style="background:#fef3c7; color:#b45309;">만료 임박 (D+${diffDays}일)</span>`;
+      } else {
+        badgeHtml = `<span class="status-badge badge-ok">안전 사용 (D+${diffDays}일)</span>`;
+      }
+
+      html += `
+        <div class="pao-item">
+          <div>
+            <strong style="font-size:13.5px; color:#1e293b;">${item.name}</strong>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">개봉일: ${item.date}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            ${badgeHtml}
+            <button class="btn-delete" onclick="deletePaoFirebase('${item.id}')">✕</button>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // ================= 6. 키즈노트 투약의뢰서 모듈 (검색 & 자동용량) =================
+  function quickSelectKidMed(name) {
+    document.getElementById('knMed').value = name;
+    onKnMedInput();
+  }
+
+  function onKnMedInput() {
+    const query = document.getElementById('knMed').value.trim().toLowerCase();
+    const weight = parseFloat(weightInput.value) || 10.0;
+    const hintBox = document.getElementById('knDoseHint');
+
+    if (!query) {
+      hintBox.style.display = 'none';
+      updateKidsNote();
+      return;
+    }
+
+    // meds 배열에서 검색어와 매칭되는 약제 탐색
+    const matched = meds.find(m => 
+      m.name.toLowerCase().includes(query) || 
+      m.products.toLowerCase().includes(query) || 
+      query.includes(m.name.toLowerCase())
+    );
+
+    if (matched) {
+      // 1회 권장량 자동 산출
+      let doseText = '';
+      if (matched.calcSingle) {
+        doseText = matched.calcSingle(weight);
+      } else if (matched.staticDose) {
+        doseText = matched.staticDose;
+      }
+
+      if (doseText) {
+        currentSuggestedDose = doseText;
+        hintBox.style.display = 'flex';
+        hintBox.innerHTML = `💡 오니 체중(${weight.toFixed(1)}kg) 권장량: <strong>${doseText}</strong> (클릭 시 자동 적용)`;
+      } else {
+        hintBox.style.display = 'none';
+      }
+
+      // 보관법 자동 선택
+      if (matched.note && matched.note.includes('냉장')) {
+        document.getElementById('knStorage').value = '냉장 보관';
+      }
+
+      // 해열제일 경우 비상 투약으로 시간 자동 전환
+      if (matched.cat === 'fever' && !query.includes('패치')) {
+        document.getElementById('knTime').value = '열이 38.0°C 이상 오를 때만 비상 투약';
+      }
+    } else {
+      hintBox.style.display = 'none';
+    }
+
+    updateKidsNote();
+  }
+
+  function applySuggestedDose() {
+    if (currentSuggestedDose) {
+      document.getElementById('knDose').value = currentSuggestedDose;
+      updateKidsNote();
+      showToast('추천 용량이 입력창에 적용되었습니다!');
+    }
+  }
+
+  function updateKidsNote() {
+    const med = document.getElementById('knMed').value.trim() || '[약품명을 입력해 주세요]';
+    const dose = document.getElementById('knDose').value.trim() || '[용량을 입력해 주세요]';
+    const time = document.getElementById('knTime').value;
+    const storage = document.getElementById('knStorage').value;
+    const memo = document.getElementById('knMemo').value.trim();
+
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+
+    let text = `[오니 어린이집 투약 의뢰서]\n\n`;
+    text += `• 날짜: ${dateStr}\n`;
+    text += `• 약품명: ${med}\n`;
+    text += `• 1회 투약량: ${dose}\n`;
+    text += `• 투약 희망 시간: ${time}\n`;
+    text += `• 보관 방법: ${storage}\n`;
+    if (memo) text += `• 전달 사항: ${memo}\n`;
+    text += `\n늘 정성으로 돌봐주셔서 감사드립니다, 선생님!`;
+
+    document.getElementById('knPreview').textContent = text;
+  }
+
+  function copyKidsNote() {
+    const text = document.getElementById('knPreview').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('키즈노트 의뢰서가 복사되었습니다!');
+    });
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 2000);
+  }
+
+  document.getElementById('paoDate').value = new Date().toISOString().split('T')[0];
+
+  render();
+  updateTimerView();
+  setInterval(updateTimerView, 60000);
+</script>
+
+</body>
+</html>
