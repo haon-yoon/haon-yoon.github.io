@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>오니의 스마트 상비약 & 케어</title>
+  <title>우리아기 스마트 상비약 & 케어</title>
 
   <style>
     :root {
@@ -22,8 +22,30 @@
     body { background-color: var(--bg); margin: 0; padding: 14px 12px 70px; color: var(--text-main); display: flex; justify-content: center; }
     .app-container { width: 100%; max-width: 480px; }
 
+    /* 헤더 및 이름 편집 영역 */
     .header { text-align: center; margin-bottom: 14px; padding-top: 4px; }
-    .header h1 { font-size: 20px; font-weight: 800; margin: 0 0 4px; color: #1e293b; letter-spacing: -0.5px; }
+    .name-edit-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .name-input {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1e293b;
+      border: none;
+      border-bottom: 2px dashed #94a3b8;
+      background: transparent;
+      text-align: center;
+      width: 75px;
+      outline: none;
+      padding: 0 2px;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-bottom-color: var(--primary); color: var(--primary); }
+    .header-title-suffix { font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
     .header p { font-size: 12px; color: var(--text-muted); margin: 0; }
 
     /* 체중 컨트롤러 (6버튼 모바일 최적화) */
@@ -392,15 +414,20 @@
 
 <div class="app-container">
   
+  <!-- 상단 헤더: 아기 이름 인라인 수정 가능 -->
   <div class="header">
-    <h1>🍼 오니의 스마트 상비약 & 케어</h1>
-    <p>체중 기반 용량 계산 · 교차복용 타이머 · 키즈노트 연동</p>
+    <div class="name-edit-wrapper">
+      <span style="font-size: 20px;">🍼</span>
+      <input type="text" id="babyNameInput" value="오니" class="name-input" oninput="onBabyNameChange(this.value)" placeholder="이름">
+      <span class="header-title-suffix">의 스마트 케어</span>
+    </div>
+    <p>체중 기반 용량 계산 · 교차복용 타이머 · 키즈노트</p>
   </div>
 
   <!-- 공통 체중 컨트롤러 (localStorage 연동) -->
   <div class="weight-card">
     <div class="weight-top">
-      <span class="weight-title">오니의 현재 체중</span>
+      <span class="weight-title"><span class="baby-name-label">오니</span>의 현재 체중</span>
       <div class="weight-display">
         <input type="number" id="babyWeight" class="weight-input" value="10.0" step="0.1" inputmode="decimal">
         <span class="weight-unit">kg</span>
@@ -429,8 +456,8 @@
     <div class="cross-dose-card">
       <div class="cross-title">💡 해열제 교차복용 핵심 수칙</div>
       <ul class="cross-rules">
-        <li><strong>교차 간격:</strong> [아세트] ↔ [덱시/이부]는 38.5°C 지속 시 <strong>최소 2시간 뒤</strong> 복용[cite: 2].</li>
-        <li><strong>동일 성분 재투약:</strong> 같은 계열은 <strong>최소 4~6시간</strong> 간격 준수[cite: 2].</li>
+        <li><strong>교차 간격:</strong> [아세트] ↔ [덱시/이부]는 38.5°C 지속 시 <strong>최소 2시간 뒤</strong> 복용.</li>
+        <li><strong>동일 성분 재투약:</strong> 같은 계열은 <strong>최소 4~6시간</strong> 간격 준수.</li>
         <li><strong><span class="warn-badge">교차 금지</span></strong> 맥시부펜(덱시부)과 부루펜(이부)은 <strong>동일 계열</strong>이므로 교차 금지![cite: 2]</li>
       </ul>
     </div>
@@ -612,15 +639,34 @@
   let currentCategory = 'all';
   let currentSuggestedDose = '';
 
+  const nameInput = document.getElementById('babyNameInput');
   const weightInput = document.getElementById('babyWeight');
   const searchInput = document.getElementById('searchInput');
   const listContainer = document.getElementById('medicineList');
 
-  // 로컬 스토리지 체중 로드
+  // ================= 2. 아기 이름 및 체중 로컬 저장소 로딩 =================
+  const savedName = localStorage.getItem('haon_baby_name') || '오니';
+  nameInput.value = savedName;
+  updateNameLabels(savedName);
+
+  function onBabyNameChange(newName) {
+    const finalName = newName.trim() || '아기';
+    localStorage.setItem('haon_baby_name', finalName);
+    updateNameLabels(finalName);
+    onKnMedInput();
+    updateKidsNote();
+  }
+
+  function updateNameLabels(name) {
+    document.querySelectorAll('.baby-name-label').forEach(el => {
+      el.textContent = name;
+    });
+  }
+
   const savedWeight = localStorage.getItem('haon_weight');
   if (savedWeight) weightInput.value = parseFloat(savedWeight).toFixed(1);
 
-  // 약품 자동완성 데이터리스트
+  // 약품 자동완성 데이터리스트 초기화
   function initMedDatalist() {
     const dl = document.getElementById('allMedOptions');
     let opts = '';
@@ -635,7 +681,7 @@
   }
   initMedDatalist();
 
-  // 체중 조절 (localStorage 저장)
+  // 체중 조절 (localStorage 연동)
   function changeWeight(delta) {
     let current = parseFloat(weightInput.value) || 10.0;
     current = Math.max(2.0, Math.min(30.0, current + delta));
@@ -739,7 +785,7 @@
   }
   searchInput.addEventListener('input', render);
 
-  // ================= 2. 타이머 및 투약 로그 (localStorage) =================
+  // ================= 3. 타이머 및 투약 로그 (localStorage) =================
   function getLogs() {
     return JSON.parse(localStorage.getItem('haon_dose_logs') || '[]');
   }
@@ -842,7 +888,7 @@
     }
   }
 
-  // ================= 3. 개봉일 D-Day 관리 (localStorage) =================
+  // ================= 4. 개봉일 D-Day 관리 (localStorage) =================
   function getPaoList() {
     return JSON.parse(localStorage.getItem('haon_pao_items') || '[]');
   }
@@ -914,7 +960,7 @@
     container.innerHTML = html;
   }
 
-  // ================= 4. 키즈노트 투약의뢰서 모듈 =================
+  // ================= 5. 키즈노트 투약의뢰서 모듈 =================
   function quickSelectKidMed(name) {
     document.getElementById('knMed').value = name;
     onKnMedInput();
@@ -923,6 +969,7 @@
   function onKnMedInput() {
     const query = document.getElementById('knMed').value.trim().toLowerCase();
     const weight = parseFloat(weightInput.value) || 10.0;
+    const currentBabyName = nameInput.value.trim() || '아기';
     const hintBox = document.getElementById('knDoseHint');
 
     if (!query) {
@@ -948,7 +995,7 @@
       if (doseText) {
         currentSuggestedDose = doseText;
         hintBox.style.display = 'flex';
-        hintBox.innerHTML = `💡 오니 체중(${weight.toFixed(1)}kg) 권장량: <strong>${doseText}</strong> (클릭 시 자동 적용)`;
+        hintBox.innerHTML = `💡 ${currentBabyName} 체중(${weight.toFixed(1)}kg) 권장량: <strong>${doseText}</strong> (클릭 시 자동 적용)`;
       } else {
         hintBox.style.display = 'none';
       }
@@ -976,6 +1023,7 @@
   }
 
   function updateKidsNote() {
+    const currentBabyName = nameInput.value.trim() || '아기';
     const med = document.getElementById('knMed').value.trim() || '[약품명을 입력해 주세요]';
     const dose = document.getElementById('knDose').value.trim() || '[용량을 입력해 주세요]';
     const time = document.getElementById('knTime').value;
@@ -985,7 +1033,7 @@
     const today = new Date();
     const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
 
-    let text = `[오니 어린이집 투약 의뢰서]\n\n`;
+    let text = `[${currentBabyName} 어린이집 투약 의뢰서]\n\n`;
     text += `• 날짜: ${dateStr}\n`;
     text += `• 약품명: ${med}\n`;
     text += `• 1회 투약량: ${dose}\n`;
