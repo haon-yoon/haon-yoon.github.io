@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>우리아기 스마트 상비약 & 케어</title>
+  <title>우리아기 스마트 상비약 & 실시간 케어</title>
+  
+  <!-- Firebase SDK (실시간 클라우드 연동) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
     :root {
@@ -24,9 +28,9 @@
     body { background-color: var(--bg); margin: 0; padding: 14px 12px 70px; color: var(--text-main); display: flex; justify-content: center; }
     .app-container { width: 100%; max-width: 480px; }
 
-    /* 헤더 */
-    .header { text-align: center; margin-bottom: 14px; padding-top: 4px; }
-    .name-edit-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px; }
+    /* 헤더 & 클라우드 상태 */
+    .header { text-align: center; margin-bottom: 12px; padding-top: 4px; }
+    .name-edit-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px; }
     .name-input {
       font-size: 20px; font-weight: 800; color: #1e293b; border: none; border-bottom: 2px dashed #94a3b8;
       background: transparent; text-align: center; width: 75px; outline: none; padding: 0 2px;
@@ -34,12 +38,16 @@
     .name-input:focus { border-bottom-color: var(--primary); color: var(--primary); }
     .header-title-suffix { font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
     .header p { font-size: 12px; color: var(--text-muted); margin: 0; }
+    .sync-badge {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px;
+      border-radius: 12px; background: #dcfce7; color: #15803d; font-weight: 700; margin-top: 5px;
+    }
+    .sync-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
 
     /* 체중 컨트롤러 */
     .weight-card {
-      background: linear-gradient(135deg, #1e293b, #334155);
-      border-radius: 18px; padding: 14px 16px; color: #ffffff;
-      box-shadow: 0 6px 18px rgba(30, 41, 59, 0.18); margin-bottom: 12px;
+      background: linear-gradient(135deg, #1e293b, #334155); border-radius: 18px;
+      padding: 14px 16px; color: #ffffff; box-shadow: 0 6px 18px rgba(30, 41, 59, 0.18); margin-bottom: 12px;
     }
     .weight-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .weight-title { font-size: 13.5px; font-weight: 600; opacity: 0.95; }
@@ -59,7 +67,7 @@
     }
     .btn-step:active { background: rgba(255, 255, 255, 0.3); }
 
-    /* 메인 네비게이션 */
+    /* 네비게이션 */
     .main-nav {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
       background: #e2e8f0; padding: 4px; border-radius: 14px; margin-bottom: 14px;
@@ -73,7 +81,7 @@
     .view-section { display: none; }
     .view-section.active { display: block; }
 
-    /* 해열제 가이드 공지 */
+    /* 복용 수칙 공지 */
     .cross-dose-card {
       background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 16px;
       padding: 13px 15px; margin-bottom: 12px;
@@ -84,7 +92,7 @@
     .cross-rules li::before { content: "•"; position: absolute; left: 1px; font-weight: 800; color: #2563eb; }
     .warn-badge { background: #fee2e2; color: #dc2626; padding: 1px 5px; border-radius: 4px; font-weight: 800; font-size: 10.5px; }
 
-    /* 검색창 & 서브탭 */
+    /* 검색 & 서브탭 */
     .search-box { margin-bottom: 10px; position: relative; }
     .search-input {
       width: 100%; background: #ffffff; border: 1.5px solid var(--border);
@@ -129,7 +137,7 @@
     .card-info { font-size: 11.5px; color: #64748b; line-height: 1.45; background: #fff; border-top: 1px dashed var(--border); padding-top: 7px; }
     .card-info strong { color: #334155; }
 
-    /* 타이머 탭: 체온 입력 & 액션 버튼 */
+    /* 타이머 탭: 체온 및 액션 */
     .temp-input-box {
       background: white; border: 1px solid var(--border); border-radius: 14px;
       padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
@@ -190,7 +198,7 @@
     .log-item-time { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
     .btn-delete { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px; padding: 2px 5px; }
 
-    /* 개봉일 & 키즈노트 */
+    /* 개봉일 관리 */
     .pao-form, .kids-card {
       background: white; border: 1px solid var(--border); border-radius: 16px;
       padding: 14px; margin-bottom: 12px;
@@ -210,7 +218,7 @@
       padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* 키즈노트 칩 & 프리뷰 */
+    /* 키즈노트 */
     .quick-chips-wrapper { display: flex; gap: 5px; overflow-x: auto; padding: 4px 0 8px; margin-bottom: 4px; scrollbar-width: none; }
     .quick-chips-wrapper::-webkit-scrollbar { display: none; }
     .med-chip {
@@ -252,7 +260,7 @@
 
 <div class="app-container">
   
-  <!-- 상단 아기 이름 편집 -->
+  <!-- 상단 헤더: 아기 이름 클라우드 동기화 -->
   <div class="header">
     <div class="name-edit-wrapper">
       <span style="font-size: 20px;">🍼</span>
@@ -260,9 +268,10 @@
       <span class="header-title-suffix">의 스마트 케어</span>
     </div>
     <p>체중 기반 용량 계산 · 교차복용 타이머 · 키즈노트</p>
+    <div class="sync-badge"><span class="sync-dot"></span> 가족 실시간 클라우드 동기화 중</div>
   </div>
 
-  <!-- 체중 컨트롤러 -->
+  <!-- 체중 컨트롤러 (Firebase 연동) -->
   <div class="weight-card">
     <div class="weight-top">
       <span class="weight-title"><span class="baby-name-label">하온</span>이의 현재 체중</span>
@@ -281,7 +290,7 @@
     </div>
   </div>
 
-  <!-- 네비게이션 -->
+  <!-- 메인 네비게이션 -->
   <div class="main-nav">
     <button class="nav-btn active" onclick="switchView('dict', this)">💊 상비약 사전</button>
     <button class="nav-btn" onclick="switchView('timer', this)">⏱️ 교차 타이머</button>
@@ -317,10 +326,10 @@
     <div id="medicineList"></div>
   </div>
 
-  <!-- VIEW 2: 교차 타이머 & 투약 로그 -->
+  <!-- VIEW 2: 실시간 교차 타이머 & 투약 기록 -->
   <div id="view-timer" class="view-section">
     
-    <!-- 투약 시 체온 입력란 -->
+    <!-- 투약 전 체온 입력 -->
     <div class="temp-input-box">
       <span style="font-size:12.5px; font-weight:700; color:#475569;">🌡️ 투약 전 현재 체온</span>
       <div class="temp-input-wrap">
@@ -330,17 +339,17 @@
     </div>
 
     <div class="timer-action-grid">
-      <button class="btn-log btn-log-red" onclick="logDose('아세트아미노펜', 'red')">
+      <button class="btn-log btn-log-red" onclick="logDoseFirebase('아세트아미노펜', 'red')">
         🔴 아세트 투약 완료
         <span id="red-quick-dose">1회 3.6ml 권장</span>
       </button>
-      <button class="btn-log btn-log-blue" onclick="logDose('덱시부/이부프로펜', 'blue')">
+      <button class="btn-log btn-log-blue" onclick="logDoseFirebase('덱시부/이부프로펜', 'blue')">
         🔵 덱시부/이부 투약 완료
         <span id="blue-quick-dose">1회 3.2ml 권장</span>
       </button>
     </div>
 
-    <!-- 24시간 누적 투약량 가드레일 -->
+    <!-- 24시간 누적량 가드레일 -->
     <div class="daily-limit-box">
       <div style="font-weight:700; color:#334155; margin-bottom:6px;">🛡️ 최근 24시간 누적 투약량 확인</div>
       <div class="limit-row">
@@ -355,7 +364,7 @@
     </div>
 
     <div class="timer-status-box">
-      <div class="status-header">⏱️ 다음 투약 가능 시각 계산</div>
+      <div class="status-header">⏱️ 다음 투약 가능 시각 (가족 실시간 동기화)</div>
       <div class="status-item">
         <div>
           <strong>🔴 아세트아미노펜 계열</strong><br>
@@ -373,7 +382,7 @@
     </div>
 
     <div class="log-list-title-wrap">
-      <h4 class="log-list-title">📋 최근 투약 일지</h4>
+      <h4 class="log-list-title">📋 최근 투약 일지 (실시간 공유)</h4>
       <button class="btn-share-log" onclick="copyDoseShareText()">📲 오늘 기록 카톡 복사</button>
     </div>
     <div id="doseLogList"></div>
@@ -399,7 +408,7 @@
         <label>개봉일자</label>
         <input type="date" id="paoDate" class="form-control">
       </div>
-      <button class="btn-primary" onclick="addPaoItem()">+ 개봉 약품 등록</button>
+      <button class="btn-primary" onclick="addPaoFirebase()">+ 개봉 약품 등록</button>
     </div>
 
     <div class="log-list-title" style="margin-bottom:8px;">📦 보관 중인 상비약 유효기간 현황</div>
@@ -476,7 +485,21 @@
 <div id="toast" class="toast">메시지</div>
 
 <script>
-  // 1. 상비약 데이터베이스
+  // ================= 1. FIREBASE 클라우드 설정 =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZw7aA7jbLPu6g1eksNY9MmG2_No9KaXc",
+    authDomain: "haon-care.firebaseapp.com",
+    databaseURL: "https://haon-care-default-rtdb.firebaseio.com",
+    projectId: "haon-care",
+    storageBucket: "haon-care.firebasestorage.app",
+    messagingSenderId: "268706206251",
+    appId: "1:268706206251:web:6b9b17fc90e94a896b106e"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // ================= 2. 상비약 데이터베이스 =================
   const meds = [
     { cat: 'fever', name: '아세트아미노펜', products: '타이레놀, 챔프 빨강, 콜대원 펜', tagClass: 'tag-red', symptom: '초기 발열, 접종열, 두통, 미열', calcSingle: (w) => (w * 0.35).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml', calcMax: (w) => (w * 2.3).toFixed(1) + ' ml', interval: '4~6시간 간격 (1일 최대 5회 이내)', note: '실온 보관, 공복 복용 가능' },
     { cat: 'fever', name: '덱시부프로펜', products: '맥시부펜, 챔프 파랑', tagClass: 'tag-blue', symptom: '38.5°C 이상 고열, 목 염증 (인후염)', calcSingle: (w) => (w * 0.3).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml', calcMax: (w) => Math.min(w * 2.4, 25).toFixed(1) + ' ml (최대 25ml)', interval: '4~6시간 간격 (1일 최대 4회 이내)', note: '실온 보관, 식후 복용 권장 (생후 6개월 이후)' },
@@ -499,6 +522,8 @@
   ];
 
   let currentCategory = 'all';
+  let sharedLogs = [];
+  let sharedPao = [];
   let currentSuggestedDose = '';
 
   const nameInput = document.getElementById('babyNameInput');
@@ -506,14 +531,45 @@
   const searchInput = document.getElementById('searchInput');
   const listContainer = document.getElementById('medicineList');
 
-  // 이름 및 체중 로컬 스토리지 연동
-  const savedName = localStorage.getItem('haon_baby_name') || '하온';
-  nameInput.value = savedName;
-  updateNameLabels(savedName);
+  // ================= 3. FIREBASE 실시간 동기화 =================
+  db.ref('baby_name').on('value', snapshot => {
+    const val = snapshot.val();
+    if (val) {
+      nameInput.value = val;
+      updateNameLabels(val);
+      onKnMedInput();
+      updateKidsNote();
+    }
+  });
+
+  db.ref('baby_weight').on('value', snapshot => {
+    const val = snapshot.val();
+    if (val) {
+      weightInput.value = parseFloat(val).toFixed(1);
+      render();
+      updateTimerView();
+      onKnMedInput();
+      updateKidsNote();
+    }
+  });
+
+  db.ref('dose_logs').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    sharedLogs = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    sharedLogs.sort((a, b) => new Date(b.time) - new Date(a.time));
+    updateTimerView();
+  });
+
+  db.ref('pao_items').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    sharedPao = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    sharedPao.sort((a, b) => new Date(b.date) - new Date(a.date));
+    renderPaoList();
+  });
 
   function onBabyNameChange(newName) {
     const finalName = newName.trim() || '아기';
-    localStorage.setItem('haon_baby_name', finalName);
+    db.ref('baby_name').set(finalName);
     updateNameLabels(finalName);
     onKnMedInput();
     updateKidsNote();
@@ -522,9 +578,6 @@
   function updateNameLabels(name) {
     document.querySelectorAll('.baby-name-label').forEach(el => el.textContent = name);
   }
-
-  const savedWeight = localStorage.getItem('haon_weight');
-  if (savedWeight) weightInput.value = parseFloat(savedWeight).toFixed(1);
 
   function initMedDatalist() {
     const dl = document.getElementById('allMedOptions');
@@ -545,7 +598,7 @@
     current = Math.max(2.0, Math.min(30.0, current + delta));
     const finalVal = current.toFixed(1);
     weightInput.value = finalVal;
-    localStorage.setItem('haon_weight', finalVal);
+    db.ref('baby_weight').set(finalVal);
     render();
     updateTimerView();
     onKnMedInput();
@@ -553,7 +606,7 @@
   }
 
   weightInput.addEventListener('input', () => {
-    localStorage.setItem('haon_weight', weightInput.value);
+    db.ref('baby_weight').set(weightInput.value);
     render();
     updateTimerView();
     onKnMedInput();
@@ -578,6 +631,7 @@
     render();
   }
 
+  // 상비약 사전 렌더링
   function render() {
     const weight = parseFloat(weightInput.value) || 9.0;
     const query = searchInput.value.trim().toLowerCase();
@@ -636,15 +690,8 @@
   }
   searchInput.addEventListener('input', render);
 
-  // 2. 타이머, 체온 및 투약 로그
-  function getLogs() {
-    return JSON.parse(localStorage.getItem('haon_dose_logs') || '[]');
-  }
-  function saveLogs(logs) {
-    localStorage.setItem('haon_dose_logs', JSON.stringify(logs));
-  }
-
-  function logDose(type, colorKey) {
+  // ================= 4. 타이머, 체온 및 투약 로그 =================
+  function logDoseFirebase(type, colorKey) {
     const weight = parseFloat(weightInput.value) || 9.0;
     const doseVal = colorKey === 'red' ? (weight * 0.4) : (weight * 0.35);
     const doseAmount = doseVal.toFixed(1) + 'ml';
@@ -653,27 +700,24 @@
     const tempVal = tempInput.value.trim();
     const tempStr = tempVal ? `${tempVal}°C` : '';
 
-    const logs = getLogs();
-    logs.unshift({
-      id: Date.now(),
+    const newLog = {
       type: type,
       colorKey: colorKey,
       time: new Date().toISOString(),
       dose: doseAmount,
       doseNum: doseVal,
       temp: tempStr
-    });
-    saveLogs(logs);
+    };
+
+    db.ref('dose_logs').push(newLog);
     tempInput.value = '';
-    updateTimerView();
-    showToast(`${type} (${doseAmount}${tempStr ? ', ' + tempStr : ''}) 기록 완료!`);
+    showToast(`${type} (${doseAmount}${tempStr ? ', ' + tempStr : ''}) 클라우드 기록 완료!`);
   }
 
-  function deleteLog(id) {
-    let logs = getLogs();
-    logs = logs.filter(l => l.id !== id);
-    saveLogs(logs);
-    updateTimerView();
+  function deleteLogFirebase(id) {
+    if (confirm('이 기록을 삭제하시겠습니까? (가족 전체 화면에서 실시간 삭제됩니다)')) {
+      db.ref('dose_logs/' + id).remove();
+    }
   }
 
   function updateTimerView() {
@@ -681,10 +725,9 @@
     document.getElementById('red-quick-dose').textContent = `1회 ${(weight * 0.4).toFixed(1)}ml 권장`;
     document.getElementById('blue-quick-dose').textContent = `1회 ${(weight * 0.35).toFixed(1)}ml 권장`;
 
-    const logs = getLogs();
     const now = new Date();
-    const lastRed = logs.find(l => l.colorKey === 'red');
-    const lastBlue = logs.find(l => l.colorKey === 'blue');
+    const lastRed = sharedLogs.find(l => l.colorKey === 'red');
+    const lastBlue = sharedLogs.find(l => l.colorKey === 'blue');
 
     evaluateNextDose('acet', lastRed, lastBlue, now);
     evaluateNextDose('ibu', lastBlue, lastRed, now);
@@ -693,7 +736,7 @@
     const dayAgo = now.getTime() - (24 * 60 * 60 * 1000);
     let red24h = 0;
     let blue24h = 0;
-    logs.forEach(l => {
+    sharedLogs.forEach(l => {
       const lTime = new Date(l.time).getTime();
       if (lTime >= dayAgo) {
         if (l.colorKey === 'red') red24h += (l.doseNum || 0);
@@ -714,15 +757,15 @@
     const bluePercent = Math.min(100, Math.round((blue24h / maxBlue) * 100));
     document.getElementById('blue-bar').style.width = bluePercent + '%';
 
-    // 리스트 렌더링
+    // 로그 목록 렌더링
     const logList = document.getElementById('doseLogList');
-    if (logs.length === 0) {
+    if (sharedLogs.length === 0) {
       logList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">기록된 투약 내역이 없습니다.</div>';
       return;
     }
 
     let html = '';
-    logs.slice(0, 15).forEach(l => {
+    sharedLogs.slice(0, 15).forEach(l => {
       const d = new Date(l.time);
       const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
       html += `
@@ -733,7 +776,7 @@
             ${l.temp ? `<span style="background:#fee2e2; color:#dc2626; font-size:11px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:4px;">🌡️ ${l.temp}</span>` : ''}
             <div class="log-item-time">${timeStr} 투약</div>
           </div>
-          <button class="btn-delete" onclick="deleteLog(${l.id})">✕</button>
+          <button class="btn-delete" onclick="deleteLogFirebase('${l.id}')">✕</button>
         </div>
       `;
     });
@@ -772,17 +815,16 @@
     }
   }
 
-  // 투약 일지 카톡 복사
+  // 오늘 투약 일지 카카오톡 공유 복사
   function copyDoseShareText() {
-    const logs = getLogs();
     const currentBabyName = nameInput.value.trim() || '아기';
-    if (logs.length === 0) {
+    if (sharedLogs.length === 0) {
       alert('공유할 투약 기록이 없습니다.');
       return;
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
-    const todayLogs = logs.filter(l => l.time.startsWith(todayStr));
+    const todayLogs = sharedLogs.filter(l => l.time.startsWith(todayStr));
 
     let text = `[🍼 ${currentBabyName} 오늘 투약 기록 공유]\n`;
     if (todayLogs.length === 0) {
@@ -807,15 +849,8 @@
     });
   }
 
-  // 3. 개봉일 D-Day 관리
-  function getPaoList() {
-    return JSON.parse(localStorage.getItem('haon_pao_items') || '[]');
-  }
-  function savePaoList(items) {
-    localStorage.setItem('haon_pao_items', JSON.stringify(items));
-  }
-
-  function addPaoItem() {
+  // ================= 5. 개봉일 D-Day 관리 (Firebase) =================
+  function addPaoFirebase() {
     const name = document.getElementById('paoMedName').value.trim();
     const date = document.getElementById('paoDate').value;
     const limitDays = parseInt(document.getElementById('paoType').value) || 28;
@@ -824,25 +859,26 @@
       alert('약품명과 개봉일을 입력해 주세요.');
       return;
     }
-    const items = getPaoList();
-    items.unshift({ id: Date.now(), name: name, date: date, limitDays: limitDays });
-    savePaoList(items);
+
+    db.ref('pao_items').push({
+      name: name,
+      date: date,
+      limitDays: limitDays
+    });
+
     document.getElementById('paoMedName').value = '';
-    renderPaoList();
-    showToast('개봉 약품이 등록되었습니다.');
+    showToast('개봉 약품이 클라우드에 등록되었습니다.');
   }
 
-  function deletePaoItem(id) {
-    let items = getPaoList();
-    items = items.filter(i => i.id !== id);
-    savePaoList(items);
-    renderPaoList();
+  function deletePaoFirebase(id) {
+    if (confirm('이 약품을 목록에서 삭제하시겠습니까?')) {
+      db.ref('pao_items/' + id).remove();
+    }
   }
 
   function renderPaoList() {
-    const items = getPaoList();
     const container = document.getElementById('paoList');
-    if (items.length === 0) {
+    if (sharedPao.length === 0) {
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">등록된 개봉 상비약이 없습니다.</div>';
       return;
     }
@@ -851,7 +887,7 @@
     today.setHours(0,0,0,0);
 
     let html = '';
-    items.forEach(item => {
+    sharedPao.forEach(item => {
       const opened = new Date(item.date);
       opened.setHours(0,0,0,0);
       const diffDays = Math.floor((today - opened) / (1000 * 60 * 60 * 24));
@@ -874,7 +910,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             ${badgeHtml}
-            <button class="btn-delete" onclick="deletePaoItem(${item.id})">✕</button>
+            <button class="btn-delete" onclick="deletePaoFirebase('${item.id}')">✕</button>
           </div>
         </div>
       `;
@@ -882,7 +918,7 @@
     container.innerHTML = html;
   }
 
-  // 4. 키즈노트 모듈
+  // ================= 6. 키즈노트 투약의뢰서 =================
   function quickSelectKidMed(name) {
     document.getElementById('knMed').value = name;
     onKnMedInput();
