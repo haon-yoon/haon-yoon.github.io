@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- PWA 홈화면 전체화면 설정 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1e293b">
+  
   <title>우리아기 스마트 상비약 & 케어</title>
 
   <style>
@@ -24,16 +28,36 @@
     body { background-color: var(--bg); margin: 0; padding: 14px 12px 70px; color: var(--text-main); display: flex; justify-content: center; }
     .app-container { width: 100%; max-width: 480px; }
 
-    /* 헤더 */
-    .header { text-align: center; margin-bottom: 14px; padding-top: 4px; }
-    .name-edit-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px; }
+    /* 헤더 & D-Day 배지 */
+    .header { text-align: center; margin-bottom: 12px; padding-top: 4px; }
+    .name-edit-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 2px; }
     .name-input {
       font-size: 20px; font-weight: 800; color: #1e293b; border: none; border-bottom: 2px dashed #94a3b8;
       background: transparent; text-align: center; width: 75px; outline: none; padding: 0 2px;
     }
     .name-input:focus { border-bottom-color: var(--primary); color: var(--primary); }
     .header-title-suffix { font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
-    .header p { font-size: 12px; color: var(--text-muted); margin: 0; }
+    .header p { font-size: 11.5px; color: var(--text-muted); margin: 0; }
+
+    .dday-badge {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; padding: 4px 10px;
+      border-radius: 14px; background: #eff6ff; color: #1d4ed8; font-weight: 800; margin-top: 6px;
+      cursor: pointer; border: 1px solid #bfdbfe;
+    }
+    .dday-popover {
+      display: none; background: white; border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px; margin-top: 8px; font-size: 11.5px; text-align: left; line-height: 1.5;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .dday-popover.show { display: block; }
+    
+    .vac-item {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 6px 0; border-bottom: 1px dashed #f1f5f9; font-size: 11.5px;
+    }
+    .vac-item:last-child { border-bottom: none; }
+    .vac-target { color: #dc2626; font-weight: 800; }
+    .vac-past { color: #94a3b8; }
 
     /* 체중 컨트롤러 */
     .weight-card {
@@ -73,7 +97,7 @@
     .view-section { display: none; }
     .view-section.active { display: block; }
 
-    /* 해열제 가이드 공지 */
+    /* 해열제 수칙 공지 */
     .cross-dose-card {
       background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 16px;
       padding: 13px 15px; margin-bottom: 12px;
@@ -129,7 +153,7 @@
     .card-info { font-size: 11.5px; color: #64748b; line-height: 1.45; background: #fff; border-top: 1px dashed var(--border); padding-top: 7px; }
     .card-info strong { color: #334155; }
 
-    /* 타이머 탭: 체온 입력 & 액션 버튼 */
+    /* 타이머 탭 */
     .temp-input-box {
       background: white; border: 1px solid var(--border); border-radius: 14px;
       padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
@@ -139,7 +163,6 @@
       width: 80px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 8px;
       font-size: 15px; font-weight: 800; text-align: center; color: #dc2626; outline: none;
     }
-    .temp-input:focus { border-color: #dc2626; }
 
     .timer-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .btn-log {
@@ -152,13 +175,11 @@
     .btn-log-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .btn-log span { font-size: 11px; font-weight: 600; opacity: 0.9; }
 
-    /* 24시간 누적량 가드레일 */
     .daily-limit-box {
       background: #f8fafc; border: 1px solid var(--border); border-radius: 14px;
       padding: 10px 12px; margin-bottom: 12px; font-size: 11.5px;
     }
     .limit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .limit-row:last-child { margin-bottom: 0; }
     .limit-bar-bg { width: 100%; height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 3px; }
     .limit-bar-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s; }
 
@@ -187,7 +208,6 @@
       background: white; border: 1px solid var(--border); border-radius: 10px;
       padding: 9px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
     }
-    .log-item-time { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
     .btn-delete { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px; padding: 2px 5px; }
 
     /* 개봉일 & 키즈노트 */
@@ -210,7 +230,6 @@
       padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* 키즈노트 칩 & 프리뷰 */
     .quick-chips-wrapper { display: flex; gap: 5px; overflow-x: auto; padding: 4px 0 8px; margin-bottom: 4px; scrollbar-width: none; }
     .quick-chips-wrapper::-webkit-scrollbar { display: none; }
     .med-chip {
@@ -227,19 +246,30 @@
       border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 700; cursor: pointer;
     }
 
-    /* 응급 박스 */
+    /* 응급 & 야간 진료 박스 */
     .emergency-box {
       background: #fff5f5; border: 1px solid #fed7d7; border-radius: 14px;
       padding: 13px; margin-top: 18px; font-size: 11.5px; color: #742a2a; line-height: 1.55;
     }
-    .emergency-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .emergency-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .emergency-box h4 { margin: 0; font-size: 12.5px; color: #9b2c2c; }
-    .btn-119 {
-      background: #dc2626; color: #ffffff; text-decoration: none;
-      padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: 800;
+    .emergency-btn-group { display: flex; gap: 5px; }
+    .btn-call {
+      text-decoration: none; padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #fff;
     }
+    .btn-119 { background: #dc2626; }
+    .btn-1339 { background: #2563eb; }
+    
+    /* 듀얼 지도 검색 그리드 */
+    .map-dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .btn-map {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 9px 0; border-radius: 8px; text-decoration: none; font-size: 11.5px; font-weight: 800;
+      border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .btn-map-naver { background: #03c75a; color: #ffffff; }
+    .btn-map-kakao { background: #fee500; color: #191919; border-color: #fada0a; }
 
-    /* 토스트 */
     .toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.9); color: white; padding: 9px 16px; border-radius: 20px;
@@ -252,14 +282,31 @@
 
 <div class="app-container">
   
-  <!-- 상단 아기 이름 편집 -->
+  <!-- 상단 헤더 & 접종 D-Day 자동 탐색 -->
   <div class="header">
     <div class="name-edit-wrapper">
       <span style="font-size: 20px;">🍼</span>
-      <input type="text" id="babyNameInput" value="하온이" class="name-input" oninput="onBabyNameChange(this.value)" placeholder="이름">
+      <input type="text" id="babyNameInput" value="하온" class="name-input" oninput="onBabyNameChange(this.value)" placeholder="이름">
       <span class="header-title-suffix">스마트 케어</span>
     </div>
     <p>체중 기반 용량 계산 · 교차복용 타이머 · 키즈노트</p>
+    <div>
+      <span class="dday-badge" onclick="toggleDdayPopover()">
+        📅 <span id="ddayText">생후 계산 중...</span> ▾
+      </span>
+    </div>
+    
+    <!-- 접종 일정 상세 팝오버 -->
+    <div id="ddayPopover" class="dday-popover">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <strong>👶 하온이 생년월일 설정</strong>
+        <span style="font-size:10.5px; color:#64748b;">(일정 자동 계산)</span>
+      </div>
+      <input type="date" id="babyBirthInput" class="form-control" style="margin-bottom:10px; padding:6px 9px;" onchange="saveBirthDate(this.value)">
+      
+      <strong style="color:#1e293b; display:block; margin-bottom:4px;">📋 앞으로의 필수 접종 로드맵</strong>
+      <div id="vacScheduleList"></div>
+    </div>
   </div>
 
   <!-- 체중 컨트롤러 -->
@@ -281,7 +328,7 @@
     </div>
   </div>
 
-  <!-- 네비게이션 -->
+  <!-- 메인 네비게이션 -->
   <div class="main-nav">
     <button class="nav-btn active" onclick="switchView('dict', this)">💊 상비약 사전</button>
     <button class="nav-btn" onclick="switchView('timer', this)">⏱️ 교차 타이머</button>
@@ -302,7 +349,7 @@
 
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="증상 또는 약품 검색 (예: 콧물, 설사, 멍, 침독)">
+      <input type="text" id="searchInput" class="search-input" placeholder="증상 또는 약품 검색 (예: 콧물, 설사, 멍, 침독, 이앓이)">
     </div>
 
     <div class="sub-tabs">
@@ -321,7 +368,7 @@
   <!-- VIEW 2: 교차 타이머 & 투약 로그 -->
   <div id="view-timer" class="view-section">
     
-    <!-- 투약 전 체온 입력란 (기본값 36.5°C) -->
+    <!-- 투약 시 체온 입력란 (기본값 36.5°C) -->
     <div class="temp-input-box">
       <span style="font-size:12.5px; font-weight:700; color:#475569;">🌡️ 투약 전 현재 체온</span>
       <div class="temp-input-wrap">
@@ -341,7 +388,7 @@
       </button>
     </div>
 
-    <!-- 24시간 누적 투약량 가드레일 -->
+    <!-- 24시간 누적량 가드레일 -->
     <div class="daily-limit-box">
       <div style="font-weight:700; color:#334155; margin-bottom:6px;">🛡️ 최근 24시간 누적 투약량 확인</div>
       <div class="limit-row">
@@ -459,16 +506,29 @@
     </div>
   </div>
 
-  <!-- 응급 적신호 카드 -->
+  <!-- 응급 & 심야·휴일 진료 박스 -->
   <div class="emergency-box">
     <div class="emergency-box-header">
-      <h4>🚨 응급실 즉시 방문 5대 적신호</h4>
-      <a href="tel:119" class="btn-119">🚨 119 연결</a>
+      <h4>🚨 응급 & 야간 진료 핫라인</h4>
+      <div class="emergency-btn-group">
+        <a href="tel:1339" class="btn-call btn-1339">📞 1339 야간상담</a>
+        <a href="tel:119" class="btn-call btn-119">🚨 119 연결</a>
+      </div>
     </div>
     • <strong>낙상/머리 쿵:</strong> 3회 이상 분수토, 의식이 처지거나 코/귀에서 맑은 액체·피가 나올 때<br>
     • <strong>급성 두드러기:</strong> 쌕쌕거리는 숨소리(천명음), 입술/혀 부종 및 쉰 목소리 동반 시<br>
     • <strong>탈수:</strong> 8시간 이상 기저귀가 마르고 울 때 눈물이 나지 않을 때<br>
     • <strong>경련:</strong> 열과 함께 눈이 돌아가고 사지가 뻣뻣해지며 1분 이상 떨 때
+
+    <!-- 네이버 & 카카오(다음) 듀얼 지도 검색 그리드 -->
+    <div class="map-dual-grid">
+      <a href="https://m.map.naver.com/search2/search.naver?query=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-naver">
+        🟢 네이버 달빛병원
+      </a>
+      <a href="https://m.map.kakao.com/actions/searchView?q=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-kakao">
+        🟡 다음/카카오 달빛병원
+      </a>
+    </div>
   </div>
 
 </div>
@@ -477,7 +537,7 @@
 <div id="toast" class="toast">메시지</div>
 
 <script>
-  // 1. 상비약 데이터베이스
+  // ================= 1. 상비약 전체 데이터베이스 =================
   const meds = [
     // 1. 해열·진통
     { cat: 'fever', name: '아세트아미노펜', products: '타이레놀, 챔프 빨강, 콜대원 펜', tagClass: 'tag-red', symptom: '초기 발열, 접종열, 두통, 미열', calcSingle: (w) => (w * 0.35).toFixed(1) + ' ~ ' + (w * 0.4).toFixed(1) + ' ml', calcMax: (w) => (w * 2.3).toFixed(1) + ' ml', interval: '4~6시간 간격 (1일 최대 5회 이내)', note: '실온 보관, 공복 복용 가능 (위장 장애 적음)' },
@@ -520,12 +580,24 @@
     { cat: 'trauma', name: '멸균 거즈 & 의료용 종이테이프', products: '개별포장 멸균거즈, 마이크로포어', tagClass: 'tag-blue', symptom: '진물 나는 상처 보호, 굴곡 부위 드레싱 고정', staticDose: '상처 소독 후 거즈를 덮고 테이프로 고정', interval: '진물이 밸 때마다 수시 교체', note: '습윤밴드 부착이 어려운 굴곡진 관절 부위에 적합' },
     { cat: 'trauma', name: '체온계 소독용 알코올 스왑', products: '1회용 에탄올 소독솜', tagClass: 'tag-gray', symptom: '체온계 프로브, 콧물 흡입기 팁 살균 소독', staticDose: '의료기기 접촉면을 꼼꼼히 닦아냄', interval: '사용 전후 즉시', note: '★ 아기 피부/상처에 직접 사용 금지 (의료기기 기구 소독 전용)' },
 
-// 6. 이앓이(치아발육통) 케어
+    // 6. 이앓이(치아발육통) 케어
     { cat: 'teething', name: '이앓이 전용 진통 (소염제)', products: '맥시부펜(덱시부), 부루펜(이부)', tagClass: 'tag-blue', symptom: '첫니/어금니 잇몸 통증, 밤샘 보챔, 침 흘림', calcSingle: (w) => (w * 0.35).toFixed(1) + ' ml', interval: '4~6시간 간격 (취침 전 1회 복용 추천)', note: '★ 아세트(타이레놀)보다 소염 성분이 있는 부루펜/덱시부 계열이 잇몸 부기 가라앉히는 데 효과적' },
     { cat: 'teething', name: '이앓이 진정 캔디', products: '오사닛 캔디 (Osanit)', tagClass: 'tag-green', symptom: '이앓이 짜증, 이유 없는 울음 진정', staticDose: '1회 7~8알 혀 밑이나 잇몸 사이에 투약', interval: '증상 지속 시 30분 간격 (1일 6~8회)', note: '물 없이 입안에서 녹여 먹이는 카모마일·자일리톨 성분 보조제' },
     { cat: 'teething', name: '이앓이 멜팅 캔디', products: '베베멜로 (Bebemelo)', tagClass: 'tag-orange', symptom: '이앓이 잇몸 통증, 이유 없는 보챔, 잇몸 간지러움', staticDose: '1회 1정 혀 밑이나 볼 안쪽에 넣어 녹여 먹임', interval: '이앓이로 보채거나 울 때 수시 복용', note: '입안에서 부드럽게 녹으며 침 분비를 돕고 잇몸 열감을 달래주는 진정 캔디' },
     { cat: 'teething', name: '이앓이 진정 앰플', products: '카밀리아 (Camilia 액상)', tagClass: 'tag-red', symptom: '이앓이 울음, 잇몸 통증, 밤잠 보챔', staticDose: '1회 1개 앰플 입안에 점적 투약', interval: '증상 지속 시 15분 간격 (1일 최대 9회)', note: '목 넘김 위험 없는 1회용 액상 앰플 (카모마일 성분)' },
     { cat: 'teething', name: '이앓이 냉장 쿨링 & 잇몸 마사지', products: '쿨링 치발기, 멸균거즈 잇몸마사지', tagClass: 'tag-gray', symptom: '잇몸 열감, 간지러움, 손가락 씹기', staticDose: '냉장실 보관 치발기 사용 또는 식염수 적신 거즈 마사지', interval: '보챌 때마다 수시로 적용', note: '★ 냉동실 치발기는 잇몸 동상 위험이 있으므로 반드시 [냉장실] 치발기 사용' }
+  ];
+
+  // 표준 소아 예방접종 일정 데이터
+  const vaccineSchedule = [
+    { name: "2개월 접종", days: 60, desc: "DTaP, 폴리오, Hib, 폐구균, 로타 1차" },
+    { name: "4개월 접종", days: 120, desc: "DTaP, 폴리오, Hib, 폐구균, 로타 2차" },
+    { name: "6개월 접종", days: 180, desc: "DTaP, 폴리오, Hib, 폐구균 3차, B형간염 3차, 독감" },
+    { name: "돌(12개월) 접종", days: 365, desc: "MMR 1차, 수두, 일본뇌염, A형간염 1차, 폐구균 4차" },
+    { name: "15개월 접종", days: 456, desc: "DTaP 4차, Hib 4차" },
+    { name: "18개월 접종", days: 548, desc: "A형간염 2차" },
+    { name: "24개월 접종", days: 730, desc: "일본뇌염 사백신 3차" },
+    { name: "만 4~6세 접종", days: 1461, desc: "DTaP 5차, 폴리오 4차, MMR 2차, 일본뇌염" }
   ];
 
   let currentCategory = 'all';
@@ -536,15 +608,16 @@
   const searchInput = document.getElementById('searchInput');
   const listContainer = document.getElementById('medicineList');
 
-  // 이름 및 체중 로컬 스토리지 연동
+  // ================= 2. 이름, 체중, 생년월일 로컬스토리지 =================
   const savedName = localStorage.getItem('haon_baby_name') || '하온';
   nameInput.value = savedName;
   updateNameLabels(savedName);
 
   function onBabyNameChange(newName) {
-    const finalName = newName.trim() || '아기';
+    const finalName = newName.trim() || '하온';
     localStorage.setItem('haon_baby_name', finalName);
     updateNameLabels(finalName);
+    updateDday();
     onKnMedInput();
     updateKidsNote();
   }
@@ -555,6 +628,84 @@
 
   const savedWeight = localStorage.getItem('haon_weight');
   if (savedWeight) weightInput.value = parseFloat(savedWeight).toFixed(1);
+
+  // 생년월일 설정
+  const defaultBirth = '2025-12-17';
+  const savedBirth = localStorage.getItem('haon_baby_birth') || defaultBirth;
+  document.getElementById('babyBirthInput').value = savedBirth;
+
+  function toggleDdayPopover() {
+    document.getElementById('ddayPopover').classList.toggle('show');
+  }
+
+  function saveBirthDate(newDate) {
+    if (!newDate) return;
+    localStorage.setItem('haon_baby_birth', newDate);
+    updateDday();
+    showToast('생년월일이 설정되었습니다.');
+  }
+
+  // 동적 다음 접종 D-Day 및 로드맵 계산
+  function updateDday() {
+    const birthStr = localStorage.getItem('haon_baby_birth') || defaultBirth;
+    const birth = new Date(birthStr);
+    const today = new Date();
+    birth.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+
+    const diffDays = Math.floor((today - birth) / (1000 * 60 * 60 * 24)) + 1;
+    const months = Math.floor(diffDays / 30.4375);
+
+    // 앞으로 맞아야 할 다음 접종 자동 검색
+    const nextVac = vaccineSchedule.find(v => v.days >= diffDays);
+    let ddayNotice = '';
+    
+    if (nextVac) {
+      const dDays = nextVac.days - diffDays;
+      if (dDays === 0) {
+        ddayNotice = `오늘 ${nextVac.name}일! 💉`;
+      } else {
+        ddayNotice = `${nextVac.name} D-${dDays}`;
+      }
+    } else {
+      ddayNotice = `모든 영유아 정기접종 완료! 🎉`;
+    }
+
+    document.getElementById('ddayText').textContent = `생후 ${diffDays}일 (${months}개월) · ${ddayNotice}`;
+
+    // 팝오버 상세 타임라인 렌더링
+    const scheduleContainer = document.getElementById('vacScheduleList');
+    let schedHtml = '';
+    
+    vaccineSchedule.forEach(v => {
+      const remaining = v.days - diffDays;
+      let badge = '';
+      let itemClass = '';
+
+      if (remaining < 0) {
+        badge = '<span class="vac-past">완료 권장</span>';
+        itemClass = 'vac-past';
+      } else if (remaining === 0) {
+        badge = '<span class="vac-target">오늘 접종!</span>';
+      } else if (v === nextVac) {
+        badge = `<span class="vac-target">D-${remaining} (다음 예정)</span>`;
+      } else {
+        badge = `<span style="color:#64748b;">D-${remaining}</span>`;
+      }
+
+      schedHtml += `
+        <div class="vac-item ${itemClass}">
+          <div>
+            <strong>${v.name}</strong> (${Math.round(v.days/30.4)}개월 기준)<br>
+            <span style="font-size:11px; opacity:0.85;">${v.desc}</span>
+          </div>
+          <div>${badge}</div>
+        </div>
+      `;
+    });
+    scheduleContainer.innerHTML = schedHtml;
+  }
+  updateDday();
 
   function initMedDatalist() {
     const dl = document.getElementById('allMedOptions');
@@ -666,7 +817,7 @@
   }
   searchInput.addEventListener('input', render);
 
-  // 2. 타이머, 체온 및 투약 로그
+  // ================= 3. 타이머, 체온 및 투약 로그 =================
   function getLogs() {
     return JSON.parse(localStorage.getItem('haon_dose_logs') || '[]');
   }
@@ -680,8 +831,8 @@
     const doseAmount = doseVal.toFixed(1) + 'ml';
     
     const tempInput = document.getElementById('tempInput');
-    const tempVal = tempInput.value.trim();
-    const tempStr = tempVal ? `${tempVal}°C` : '';
+    const tempVal = tempInput.value.trim() || '36.5';
+    const tempStr = `${tempVal}°C`;
 
     const logs = getLogs();
     logs.unshift({
@@ -694,9 +845,9 @@
       temp: tempStr
     });
     saveLogs(logs);
-    tempInput.value = '';
+    tempInput.value = '36.5';
     updateTimerView();
-    showToast(`${type} (${doseAmount}${tempStr ? ', ' + tempStr : ''}) 기록 완료!`);
+    showToast(`${type} (${doseAmount}, ${tempStr}) 기록 완료!`);
   }
 
   function deleteLog(id) {
@@ -719,7 +870,6 @@
     evaluateNextDose('acet', lastRed, lastBlue, now);
     evaluateNextDose('ibu', lastBlue, lastRed, now);
 
-    // 24시간 누적량 계산
     const dayAgo = now.getTime() - (24 * 60 * 60 * 1000);
     let red24h = 0;
     let blue24h = 0;
@@ -744,7 +894,6 @@
     const bluePercent = Math.min(100, Math.round((blue24h / maxBlue) * 100));
     document.getElementById('blue-bar').style.width = bluePercent + '%';
 
-    // 리스트 렌더링
     const logList = document.getElementById('doseLogList');
     if (logs.length === 0) {
       logList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">기록된 투약 내역이 없습니다.</div>';
@@ -761,7 +910,7 @@
             <strong>${l.colorKey === 'red' ? '🔴' : '🔵'} ${l.type}</strong> 
             <span style="color:#2563eb; font-weight:700; margin-left:4px;">${l.dose}</span>
             ${l.temp ? `<span style="background:#fee2e2; color:#dc2626; font-size:11px; font-weight:800; padding:1px 5px; border-radius:4px; margin-left:4px;">🌡️ ${l.temp}</span>` : ''}
-            <div class="log-item-time">${timeStr} 투약</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${timeStr} 투약</div>
           </div>
           <button class="btn-delete" onclick="deleteLog(${l.id})">✕</button>
         </div>
@@ -802,10 +951,9 @@
     }
   }
 
-  // 투약 일지 카톡 복사
   function copyDoseShareText() {
     const logs = getLogs();
-    const currentBabyName = nameInput.value.trim() || '아기';
+    const currentBabyName = nameInput.value.trim() || '하온';
     if (logs.length === 0) {
       alert('공유할 투약 기록이 없습니다.');
       return;
@@ -837,7 +985,7 @@
     });
   }
 
-  // 3. 개봉일 D-Day 관리
+  // ================= 4. 개봉일 D-Day 관리 =================
   function getPaoList() {
     return JSON.parse(localStorage.getItem('haon_pao_items') || '[]');
   }
@@ -912,7 +1060,7 @@
     container.innerHTML = html;
   }
 
-  // 4. 키즈노트 모듈
+  // ================= 5. 키즈노트 모듈 =================
   function quickSelectKidMed(name) {
     document.getElementById('knMed').value = name;
     onKnMedInput();
@@ -921,7 +1069,7 @@
   function onKnMedInput() {
     const query = document.getElementById('knMed').value.trim().toLowerCase();
     const weight = parseFloat(weightInput.value) || 9.0;
-    const currentBabyName = nameInput.value.trim() || '아기';
+    const currentBabyName = nameInput.value.trim() || '하온';
     const hintBox = document.getElementById('knDoseHint');
 
     if (!query) {
@@ -967,7 +1115,7 @@
   }
 
   function updateKidsNote() {
-    const currentBabyName = nameInput.value.trim() || '아기';
+    const currentBabyName = nameInput.value.trim() || '하온';
     const med = document.getElementById('knMed').value.trim() || '[약품명을 입력해 주세요]';
     const dose = document.getElementById('knDose').value.trim() || '[용량을 입력해 주세요]';
     const time = document.getElementById('knTime').value;
