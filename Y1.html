@@ -312,7 +312,7 @@
     
     <div id="ddayPopover" class="dday-popover">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-        <strong>👶 <span class="baby-name-label">하온</span> 생년월일 설정</strong>
+        <strong>👶 <span class="baby-name-label">오니</span> 생년월일 설정</strong>
         <span style="font-size:10.5px; color:#64748b;">(가족 실시간 동기화)</span>
       </div>
       <input type="date" id="babyBirthInput" class="form-control" style="margin-bottom:10px; padding:6px 9px;" onchange="saveBirthDate(this.value)">
@@ -329,7 +329,7 @@
   <!-- 체중 컨트롤러 -->
   <div class="weight-card">
     <div class="weight-top">
-      <span class="weight-title"><span class="baby-name-label">하온</span> 현재 체중</span>
+      <span class="weight-title"><span class="baby-name-label">오니</span> 현재 체중</span>
       <div class="weight-display">
         <input type="number" id="babyWeight" class="weight-input" value="9.0" step="0.1" inputmode="decimal">
         <span class="weight-unit">kg</span>
@@ -683,7 +683,7 @@
   });
 
   function onBabyNameChange(newName) {
-    const finalName = newName.trim() || '하온';
+    const finalName = newName.trim() || '오니';
     db.ref('baby_name').set(finalName);
     updateNameLabels(finalName);
     onKnMedInput();
@@ -997,7 +997,7 @@
   }
 
   function copyDoseShareText() {
-    const currentBabyName = nameInput.value.trim() || '하온';
+    const currentBabyName = nameInput.value.trim() || '오니';
     if (sharedLogs.length === 0) {
       alert('공유할 투약 기록이 없습니다.');
       return;
@@ -1107,7 +1107,7 @@
   function onKnMedInput() {
     const query = document.getElementById('knMed').value.trim().toLowerCase();
     const weight = parseFloat(weightInput.value) || 9.0;
-    const currentBabyName = nameInput.value.trim() || '하온';
+    const currentBabyName = nameInput.value.trim() || '오니';
     const hintBox = document.getElementById('knDoseHint');
 
     if (!query) {
@@ -1153,7 +1153,7 @@
   }
 
   function updateKidsNote() {
-    const currentBabyName = nameInput.value.trim() || '하온';
+    const currentBabyName = nameInput.value.trim() || '오니';
     const med = document.getElementById('knMed').value.trim() || '[약품명을 입력해 주세요]';
     const dose = document.getElementById('knDose').value.trim() || '[용량을 입력해 주세요]';
     const time = document.getElementById('knTime').value;
