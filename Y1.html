@@ -662,7 +662,7 @@
   });
 
   // 생년월일 동기화
-  const defaultBirth = '2025-12-16';
+  const defaultBirth = '2025-12-17';
   db.ref('baby_birth').on('value', snapshot => {
     const val = snapshot.val() || defaultBirth;
     document.getElementById('babyBirthInput').value = val;
