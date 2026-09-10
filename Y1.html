@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1e293b">
   
-  <title>하온 스마트 상비약 & 실시간 케어</title>
+  <title>오니 스마트 상비약 & 실시간 케어</title>
   
   <!-- Firebase SDK (실시간 클라우드 연동) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -192,6 +192,7 @@
       padding: 10px 12px; margin-bottom: 12px; font-size: 11.5px;
     }
     .limit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .limit-row:last-child { margin-bottom: 0; }
     .limit-bar-bg { width: 100%; height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 3px; }
     .limit-bar-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s; }
 
@@ -277,7 +278,7 @@
     .btn-map {
       display: flex; align-items: center; justify-content: center; gap: 4px;
       padding: 9px 0; border-radius: 8px; text-decoration: none; font-size: 11.5px; font-weight: 800;
-      border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.04); cursor: pointer;
     }
     .btn-map-naver { background: #03c75a; color: #ffffff; }
     .btn-map-kakao { background: #fee500; color: #191919; border-color: #fada0a; }
@@ -294,7 +295,7 @@
 
 <div class="app-container">
   
-  <!-- 상단 헤더: 파란색 접종 D-Day 배지가 위로, 초록색 동기화 배지가 아래로 정돈 -->
+  <!-- 상단 헤더 -->
   <div class="header">
     <div class="name-edit-wrapper">
       <span style="font-size: 20px;">🍼</span>
@@ -303,14 +304,12 @@
     </div>
     <p>체중 기반 용량 계산 · 교차복용 타이머 · 키즈노트</p>
     
-    <!-- 1. 위쪽: 파란색 접종 D-Day 배지 -->
     <div>
       <span class="dday-badge" onclick="toggleDdayPopover()">
         📅 <span id="ddayText">생후 계산 중...</span> ▾
       </span>
     </div>
     
-    <!-- 접종 일정 상세 팝오버 (터치 시 펼쳐짐) -->
     <div id="ddayPopover" class="dday-popover">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <strong>👶 <span class="baby-name-label">하온</span> 생년월일 설정</strong>
@@ -322,13 +321,12 @@
       <div id="vacScheduleList"></div>
     </div>
 
-    <!-- 2. 아래쪽: 초록색 클라우드 실시간 동기화 배지 -->
     <div style="margin-top: 6px;">
       <div class="sync-badge"><span class="sync-dot"></span> 가족 실시간 클라우드 동기화 중</div>
     </div>
   </div>
 
-  <!-- 체중 컨트롤러 (Firebase 실시간 연동) -->
+  <!-- 체중 컨트롤러 -->
   <div class="weight-card">
     <div class="weight-top">
       <span class="weight-title"><span class="baby-name-label">하온</span> 현재 체중</span>
@@ -386,8 +384,6 @@
 
   <!-- VIEW 2: 실시간 교차 타이머 & 투약 로그 -->
   <div id="view-timer" class="view-section">
-    
-    <!-- 투약 전 체온 입력란 (기본값 36.5°C) -->
     <div class="temp-input-box">
       <span style="font-size:12.5px; font-weight:700; color:#475569;">🌡️ 투약 전 현재 체온</span>
       <div class="temp-input-wrap">
@@ -407,7 +403,6 @@
       </button>
     </div>
 
-    <!-- 24시간 누적량 가드레일 -->
     <div class="daily-limit-box">
       <div style="font-weight:700; color:#334155; margin-bottom:6px;">🛡️ 최근 24시간 누적 투약량 확인</div>
       <div class="limit-row">
@@ -446,7 +441,7 @@
     <div id="doseLogList"></div>
   </div>
 
-  <!-- VIEW 3: 개봉일 관리 (Firebase 실시간 연동) -->
+  <!-- VIEW 3: 개봉일 관리 -->
   <div id="view-pao" class="view-section">
     <div class="pao-form">
       <div class="form-group">
@@ -541,10 +536,10 @@
 
     <!-- 네이버 & 카카오(다음) 듀얼 지도 검색 그리드 -->
     <div class="map-dual-grid">
-      <a href="https://m.map.naver.com/search2/search.naver?query=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-naver">
+      <a href="javascript:void(0);" onclick="openNaverMapApp()" class="btn-map btn-map-naver">
         🟢 네이버 달빛병원
       </a>
-      <a href="https://m.map.kakao.com/actions/searchView?q=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-kakao">
+      <a href="javascript:void(0);" onclick="openKakaoMapApp()" class="btn-map btn-map-kakao">
         🟡 다음/카카오 달빛병원
       </a>
     </div>
@@ -644,7 +639,6 @@
   const listContainer = document.getElementById('medicineList');
 
   // ================= 3. FIREBASE 실시간 리스너 =================
-  // 아기 이름 동기화
   db.ref('baby_name').on('value', snapshot => {
     const val = snapshot.val();
     if (val) {
@@ -655,7 +649,6 @@
     }
   });
 
-  // 체중 동기화
   db.ref('baby_weight').on('value', snapshot => {
     const val = snapshot.val();
     if (val) {
@@ -667,7 +660,6 @@
     }
   });
 
-  // 생년월일 동기화
   const defaultBirth = '2025-12-16';
   db.ref('baby_birth').on('value', snapshot => {
     const val = snapshot.val() || defaultBirth;
@@ -676,7 +668,6 @@
     updateDday();
   });
 
-  // 투약 로그 동기화
   db.ref('dose_logs').on('value', snapshot => {
     const data = snapshot.val() || {};
     sharedLogs = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -684,7 +675,6 @@
     updateTimerView();
   });
 
-  // 개봉약 동기화
   db.ref('pao_items').on('value', snapshot => {
     const data = snapshot.val() || {};
     sharedPao = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -714,7 +704,6 @@
     showToast('생년월일이 클라우드에 저장되었습니다.');
   }
 
-  // 동적 접종 D-Day 및 로드맵 계산
   function updateDday() {
     const birthStr = document.getElementById('babyBirthInput').value || defaultBirth;
     const birth = new Date(birthStr);
@@ -725,7 +714,6 @@
     const diffDays = Math.floor((today - birth) / (1000 * 60 * 60 * 24)) + 1;
     const months = Math.floor(diffDays / 30.4375);
 
-    // 가장 가까운 다음 접종 자동 탐색
     const nextVac = vaccineSchedule.find(v => v.days >= diffDays);
     let ddayNotice = '';
     
@@ -742,7 +730,6 @@
 
     document.getElementById('ddayText').textContent = `생후 ${diffDays}일 (${months}개월) · ${ddayNotice}`;
 
-    // 팝오버 리스트 렌더링
     const scheduleContainer = document.getElementById('vacScheduleList');
     let schedHtml = '';
     
@@ -928,7 +915,6 @@
     evaluateNextDose('acet', lastRed, lastBlue, now);
     evaluateNextDose('ibu', lastBlue, lastRed, now);
 
-    // 24시간 누적량 계산
     const dayAgo = now.getTime() - (24 * 60 * 60 * 1000);
     let red24h = 0;
     let blue24h = 0;
@@ -953,7 +939,6 @@
     const bluePercent = Math.min(100, Math.round((blue24h / maxBlue) * 100));
     document.getElementById('blue-bar').style.width = bluePercent + '%';
 
-    // 로그 목록 렌더링
     const logList = document.getElementById('doseLogList');
     if (sharedLogs.length === 0) {
       logList.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">기록된 투약 내역이 없습니다.</div>';
@@ -1011,7 +996,6 @@
     }
   }
 
-  // 오늘 투약 일지 카카오톡 공유 복사
   function copyDoseShareText() {
     const currentBabyName = nameInput.value.trim() || '하온';
     if (sharedLogs.length === 0) {
@@ -1196,6 +1180,51 @@
     navigator.clipboard.writeText(text).then(() => {
       showToast('키즈노트 의뢰서가 복사되었습니다!');
     });
+  }
+
+  // ================= 7. 지도 앱/웹 반응형 직접 실행 함수 =================
+  function openNaverMapApp() {
+    const query = encodeURIComponent('달빛어린이병원');
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      location.href = `intent://search?query=${query}&appname=haoncare#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end`;
+    } else if (isIOS) {
+      const appUrl = `nmap://search?query=${query}&appname=haoncare`;
+      const webUrl = `https://m.map.naver.com/search2/search.naver?query=${query}`;
+      const clickTime = Date.now();
+      location.href = appUrl;
+      setTimeout(() => {
+        if (Date.now() - clickTime < 1500) {
+          location.href = webUrl;
+        }
+      }, 1000);
+    } else {
+      window.open(`https://map.naver.com/p/search/${query}`, '_blank');
+    }
+  }
+
+  function openKakaoMapApp() {
+    const query = encodeURIComponent('달빛어린이병원');
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      location.href = `intent://search?q=${query}#Intent;scheme=kakaomap;package=net.daum.android.map;end`;
+    } else if (isIOS) {
+      const appUrl = `kakaomap://search?q=${query}`;
+      const webUrl = `https://m.map.kakao.com/actions/searchView?q=${query}`;
+      const clickTime = Date.now();
+      location.href = appUrl;
+      setTimeout(() => {
+        if (Date.now() - clickTime < 1500) {
+          location.href = webUrl;
+        }
+      }, 1000);
+    } else {
+      window.open(`https://map.kakao.com/?q=${query}`, '_blank');
+    }
   }
 
   function showToast(msg) {
