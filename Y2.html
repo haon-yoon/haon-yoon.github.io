@@ -37,11 +37,12 @@
     }
     .name-input:focus { border-bottom-color: var(--primary); color: var(--primary); }
     .header-title-suffix { font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
-    .header p { font-size: 11.5px; color: var(--text-muted); margin: 0; }
+    .header p { font-size: 11.5px; color: var(--text-muted); margin: 0 0 6px 0; }
 
+    /* 파란색 접종 D-Day 배지 */
     .dday-badge {
       display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; padding: 4px 10px;
-      border-radius: 14px; background: #eff6ff; color: #1d4ed8; font-weight: 800; margin-top: 6px;
+      border-radius: 14px; background: #eff6ff; color: #1d4ed8; font-weight: 800;
       cursor: pointer; border: 1px solid #bfdbfe;
     }
     .dday-popover {
@@ -180,6 +181,7 @@
       padding: 10px 12px; margin-bottom: 12px; font-size: 11.5px;
     }
     .limit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .limit-row:last-child { margin-bottom: 0; }
     .limit-bar-bg { width: 100%; height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 3px; }
     .limit-bar-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s; }
 
@@ -260,12 +262,12 @@
     .btn-119 { background: #dc2626; }
     .btn-1339 { background: #2563eb; }
     
-    /* 듀얼 지도 검색 그리드 */
+    /* 네이버 & 카카오(다음) 듀얼 지도 검색 그리드 */
     .map-dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
     .btn-map {
       display: flex; align-items: center; justify-content: center; gap: 4px;
       padding: 9px 0; border-radius: 8px; text-decoration: none; font-size: 11.5px; font-weight: 800;
-      border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.04); cursor: pointer;
     }
     .btn-map-naver { background: #03c75a; color: #ffffff; }
     .btn-map-kakao { background: #fee500; color: #191919; border-color: #fada0a; }
@@ -299,7 +301,7 @@
     <!-- 접종 일정 상세 팝오버 -->
     <div id="ddayPopover" class="dday-popover">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-        <strong>👶 오니 생년월일 설정</strong>
+        <strong>👶 <span class="baby-name-label">하온</span> 생년월일 설정</strong>
         <span style="font-size:10.5px; color:#64748b;">(일정 자동 계산)</span>
       </div>
       <input type="date" id="babyBirthInput" class="form-control" style="margin-bottom:10px; padding:6px 9px;" onchange="saveBirthDate(this.value)">
@@ -309,7 +311,7 @@
     </div>
   </div>
 
-  <!-- 체중 컨트롤러 -->
+  <!-- 체중 컨트롤러 (로컬 스토리지 연동) -->
   <div class="weight-card">
     <div class="weight-top">
       <span class="weight-title"><span class="baby-name-label">하온</span> 현재 체중</span>
@@ -520,12 +522,12 @@
     • <strong>탈수:</strong> 8시간 이상 기저귀가 마르고 울 때 눈물이 나지 않을 때<br>
     • <strong>경련:</strong> 열과 함께 눈이 돌아가고 사지가 뻣뻣해지며 1분 이상 떨 때
 
-    <!-- 네이버 & 카카오(다음) 듀얼 지도 검색 그리드 -->
+    <!-- 네이버 & 카카오(다음) 듀얼 지도 검색 그리드 (네이버 앱 직접 연동 적용) -->
     <div class="map-dual-grid">
-      <a href="https://m.map.naver.com/search2/search.naver?query=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-naver">
+      <a href="javascript:void(0);" onclick="openNaverMapApp()" class="btn-map btn-map-naver">
         🟢 네이버 달빛병원
       </a>
-      <a href="https://m.map.kakao.com/actions/searchView?q=%EB%8B%AC%EB%B9%9B%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%B3%91%EC%9B%90" target="_blank" rel="noopener noreferrer" class="btn-map btn-map-kakao">
+      <a href="javascript:void(0);" onclick="openKakaoMapApp()" class="btn-map btn-map-kakao">
         🟡 다음/카카오 달빛병원
       </a>
     </div>
@@ -629,8 +631,7 @@
   const savedWeight = localStorage.getItem('haon_weight');
   if (savedWeight) weightInput.value = parseFloat(savedWeight).toFixed(1);
 
-  // 생년월일 설정
-  const defaultBirth = '2025-12-17';
+  const defaultBirth = '2025-12-16';
   const savedBirth = localStorage.getItem('haon_baby_birth') || defaultBirth;
   document.getElementById('babyBirthInput').value = savedBirth;
 
@@ -645,7 +646,6 @@
     showToast('생년월일이 설정되었습니다.');
   }
 
-  // 동적 다음 접종 D-Day 및 로드맵 계산
   function updateDday() {
     const birthStr = localStorage.getItem('haon_baby_birth') || defaultBirth;
     const birth = new Date(birthStr);
@@ -656,7 +656,6 @@
     const diffDays = Math.floor((today - birth) / (1000 * 60 * 60 * 24)) + 1;
     const months = Math.floor(diffDays / 30.4375);
 
-    // 앞으로 맞아야 할 다음 접종 자동 검색
     const nextVac = vaccineSchedule.find(v => v.days >= diffDays);
     let ddayNotice = '';
     
@@ -673,7 +672,6 @@
 
     document.getElementById('ddayText').textContent = `생후 ${diffDays}일 (${months}개월) · ${ddayNotice}`;
 
-    // 팝오버 상세 타임라인 렌더링
     const scheduleContainer = document.getElementById('vacScheduleList');
     let schedHtml = '';
     
@@ -1142,6 +1140,51 @@
     navigator.clipboard.writeText(text).then(() => {
       showToast('키즈노트 의뢰서가 복사되었습니다!');
     });
+  }
+
+  // ================= 6. 지도 앱/웹 반응형 직접 실행 함수 =================
+  function openNaverMapApp() {
+    const query = encodeURIComponent('달빛어린이병원');
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      location.href = `intent://search?query=${query}&appname=haoncare#Intent;scheme=nmap;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;end`;
+    } else if (isIOS) {
+      const appUrl = `nmap://search?query=${query}&appname=haoncare`;
+      const webUrl = `https://m.map.naver.com/search2/search.naver?query=${query}`;
+      const clickTime = Date.now();
+      location.href = appUrl;
+      setTimeout(() => {
+        if (Date.now() - clickTime < 1500) {
+          location.href = webUrl;
+        }
+      }, 1000);
+    } else {
+      window.open(`https://map.naver.com/p/search/${query}`, '_blank');
+    }
+  }
+
+  function openKakaoMapApp() {
+    const query = encodeURIComponent('달빛어린이병원');
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      location.href = `intent://search?q=${query}#Intent;scheme=kakaomap;package=net.daum.android.map;end`;
+    } else if (isIOS) {
+      const appUrl = `kakaomap://search?q=${query}`;
+      const webUrl = `https://m.map.kakao.com/actions/searchView?q=${query}`;
+      const clickTime = Date.now();
+      location.href = appUrl;
+      setTimeout(() => {
+        if (Date.now() - clickTime < 1500) {
+          location.href = webUrl;
+        }
+      }, 1000);
+    } else {
+      window.open(`https://map.kakao.com/?q=${query}`, '_blank');
+    }
   }
 
   function showToast(msg) {
