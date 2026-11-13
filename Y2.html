@@ -468,12 +468,12 @@
 
     <div class="timer-action-grid">
       <button class="btn-log btn-log-red" onclick="logDoseLocal('아세트아미노펜', 'red')">
-        🔴 아세트 투약 기록
-        <span id="red-quick-dose">실제 투여량 직접 입력</span>
+        🔴 아세트 투약 완료
+        <span id="red-quick-dose">1회 용량 계산 중</span>
       </button>
       <button class="btn-log btn-log-blue" onclick="logDoseLocal('덱시부/이부프로펜', 'blue')">
-        🔵 덱시부/이부 투약 기록
-        <span id="blue-quick-dose">실제 투여량 직접 입력</span>
+        🔵 덱시부/이부 투약 완료
+        <span id="blue-quick-dose">1회 용량 계산 중</span>
       </button>
     </div>
 
@@ -1225,13 +1225,10 @@
   }
 
   function logDoseLocal(type, colorKey) {
-    const doseInput = prompt(`${type}\n실제로 투여한 양을 mL로 입력해 주세요.\n제품 설명서 또는 처방에 따라 실제 투여한 양만 기록하세요.`);
-    if (doseInput === null) return;
-    const doseVal = Number.parseFloat(doseInput);
-    if (!Number.isFinite(doseVal) || doseVal <= 0 || doseVal > 100) {
-      alert('실제 투여량은 0보다 크고 100mL 이하의 숫자로 입력해 주세요.');
-      return;
-    }
+    // Y1의 기존 계산식을 그대로 적용하고, 계산된 mL를 투약 기록에도 저장합니다.
+    const weight = parseFloat(weightInput.value) || 9.0;
+    const doseVal = colorKey === 'red' ? (weight * 0.4) : (weight * 0.35);
+    const doseAmount = doseVal.toFixed(1) + 'ml';
 
     const tempInput = document.getElementById('tempInput');
     const tempRaw = tempInput.value.trim();
@@ -1246,7 +1243,7 @@
       type,
       colorKey,
       time: new Date().toISOString(),
-      dose: `${doseVal.toFixed(1)}ml`,
+      dose: doseAmount,
       doseNum: doseVal,
       temp: tempRaw === '' ? '' : `${tempNum.toFixed(1)}°C`,
       verifiedActual: true
@@ -1255,7 +1252,7 @@
     sharedLogs.unshift(newLog);
     saveDoseLogs();
     updateTimerView();
-    showToast(`${type} 실제 투여량 ${newLog.dose} 기록 완료`);
+    showToast(`${type} (${doseAmount}) 투약 기록 완료 · 이 기기에 저장되었습니다.`);
   }
 
   function deleteLogLocal(id) {
@@ -1267,8 +1264,10 @@
 
   function updateTimerView() {
     renderWaterIntake();
-    document.getElementById('red-quick-dose').textContent = '실제 투여량 직접 입력';
-    document.getElementById('blue-quick-dose').textContent = '실제 투여량 직접 입력';
+    // Y1과 동일한 체중 기반 표시 계산식
+    const weight = parseFloat(weightInput.value) || 9.0;
+    document.getElementById('red-quick-dose').textContent = `1회 ${(weight * 0.4).toFixed(1)}ml 권장`;
+    document.getElementById('blue-quick-dose').textContent = `1회 ${(weight * 0.35).toFixed(1)}ml 권장`;
 
     const now = new Date();
     const verifiedLogs = sharedLogs.filter(l => l.verifiedActual === true);
