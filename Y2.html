@@ -165,14 +165,24 @@
 
     /* 타이머 탭 & 체온 컨트롤러 */
     .temp-input-box {
-      background: white; border: 1px solid var(--border); border-radius: 14px;
+      background: white; border: 1.5px solid var(--border); border-radius: 14px;
       padding: 12px 14px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 9px;
+      transition: all 0.25s;
     }
+    .temp-input-box.warn-fever { border-color: #f59e0b; background: #fffbeb; }
+    .temp-input-box.high-fever { border-color: #dc2626; background: #fef2f2; }
+
+    .fever-alert-banner {
+      display: none; padding: 8px 10px; border-radius: 9px; font-size: 11.5px; font-weight: 700; line-height: 1.45;
+    }
+    .fever-alert-banner.warn { display: block; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .fever-alert-banner.high { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
     .temp-top-row { display: flex; align-items: center; justify-content: space-between; }
     .temp-input-wrap { display: flex; align-items: center; gap: 6px; }
     .temp-input {
-      width: 80px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 8px;
-      font-size: 16px; font-weight: 800; text-align: center; color: #dc2626; outline: none;
+      width: 90px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-weight: 800; text-align: center; color: #dc2626; outline: none; background: #fff;
     }
     .temp-btn-group { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
     .btn-temp-step {
@@ -192,6 +202,24 @@
     .btn-log-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .btn-log span { font-size: 11px; font-weight: 600; opacity: 0.9; }
 
+    /* 열감기 케어 보조 카드 (미온수 마사지 & 수분 섭취) */
+    .care-helper-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .care-card {
+      background: #ffffff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 11px 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    }
+    .care-card-title { font-size: 12px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 4px; }
+    .care-card-value { font-size: 16px; font-weight: 800; color: #0284c7; }
+    .care-btn-row { display: flex; gap: 4px; }
+    .btn-mini {
+      flex: 1; border: none; border-radius: 8px; padding: 6px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .btn-water { background: #e0f2fe; color: #0369a1; }
+    .btn-water:active { background: #bae6fd; }
+    .btn-sponge { background: #fef3c7; color: #b45309; }
+    .btn-sponge.running { background: #dc2626; color: #fff; }
+    .btn-reset-mini { background: #f1f5f9; color: #64748b; flex: 0 0 auto; padding: 6px 8px; }
+
     /* 최근 체온 추이 요약 바 */
     .temp-trend-box {
       background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px;
@@ -207,14 +235,19 @@
     }
     .limit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .limit-row:last-child { margin-bottom: 0; }
-    .limit-bar-bg { width: 100%; height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 3px; }
-    .limit-bar-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s; }
 
     .timer-status-box {
       background: white; border: 1px solid var(--border); border-radius: 16px;
       padding: 14px; margin-bottom: 12px;
     }
-    .status-header { font-size: 12.5px; font-weight: 700; color: #64748b; margin-bottom: 8px; }
+    .status-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .status-header { font-size: 12.5px; font-weight: 700; color: #64748b; }
+    .btn-noti {
+      background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;
+      border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .btn-noti.enabled { background: #dcfce7; border-color: #86efac; color: #15803d; }
+
     .status-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;
@@ -410,14 +443,18 @@
 
   <!-- VIEW 2: 실시간 교차 타이머 & 투약 로그 -->
   <div id="view-timer" class="view-section">
-    <div class="temp-input-box">
+    <div id="tempInputBox" class="temp-input-box">
       <div class="temp-top-row">
         <span style="font-size:12.5px; font-weight:700; color:#475569;">🌡️ 투약 전 현재 체온</span>
         <div class="temp-input-wrap">
-          <input type="number" id="tempInput" class="temp-input" placeholder="측정 시 입력" step="0.1" inputmode="decimal">
+          <input type="number" id="tempInput" class="temp-input" placeholder="측정 시 입력" step="0.1" inputmode="decimal" oninput="checkFeverAlert()">
           <span style="font-size:13px; font-weight:700; color:#64748b;">°C</span>
         </div>
       </div>
+
+      <!-- 고열 시각적 경고 배너 -->
+      <div id="feverAlertBanner" class="fever-alert-banner"></div>
+
       <!-- 체온 미세 조절 버튼 그룹 -->
       <div class="temp-btn-group">
         <button class="btn-temp-step" onclick="changeTemp(-1.0)">-1.0°</button>
@@ -440,6 +477,32 @@
       </button>
     </div>
 
+    <!-- 열감기 집중 케어 도우미: 미온수 마사지 타이머 & 탈수 방지 수분 카운터 -->
+    <div class="care-helper-grid">
+      <!-- 미온수 마사지 타이머 -->
+      <div class="care-card">
+        <div class="care-card-title">🛁 미온수 마사지</div>
+        <div class="care-card-value" id="spongeTimerDisplay" style="color:#d97706;">대기 중</div>
+        <div class="care-btn-row">
+          <button class="btn-mini btn-sponge" id="spongeActionBtn" onclick="toggleSpongeTimer()">▶ 30분 시작</button>
+          <button class="btn-mini btn-reset-mini" onclick="resetSpongeTimer()" title="초기화">↺</button>
+        </div>
+      </div>
+
+      <!-- 탈수 방지 수분 섭취 카운터 -->
+      <div class="care-card">
+        <div class="care-card-title">💧 오늘 수분 섭취</div>
+        <div class="care-card-value" id="waterTotalDisplay">0 ml</div>
+        <div class="care-btn-row">
+          <button class="btn-mini btn-water" onclick="addWaterLocal(10)">+10ml</button>
+          <button class="btn-mini btn-water" onclick="addWaterLocal(20)">+20ml</button>
+          <button class="btn-mini btn-water" onclick="addWaterLocal(50)">+50ml</button>
+          <button class="btn-mini btn-water" onclick="addWaterLocal(100)">+100ml</button>
+          <button class="btn-mini btn-reset-mini" onclick="resetWaterLocal()" title="초기화">↺</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 최근 체온 변화 추이 요약 -->
     <div id="tempTrendContainer" class="temp-trend-box" style="display:none;">
       <strong>📈 최근 측정 체온 추이 (과거 → 최신)</strong>
@@ -460,7 +523,10 @@
     </div>
 
     <div class="timer-status-box">
-      <div class="status-header">⏱️ 다음 투약 참고 시간 (이 기기에 저장)</div>
+      <div class="status-header-row">
+        <div class="status-header">⏱️ 다음 투약 참고 시간 (이 기기에 저장)</div>
+        <button id="btnEnableNoti" class="btn-noti" onclick="requestNotiPermission()">🔔 알림 켜기</button>
+      </div>
       <div style="font-size:10.5px;color:#b45309;background:#fffbeb;padding:7px 9px;border-radius:8px;margin-bottom:8px;line-height:1.45;">앱의 기본 간격 계산은 참고용입니다. 실제 투약 가능 여부는 제품별 성분·농도·연령 제한 및 처방/설명서를 확인해 판단해 주세요.</div>
       <div class="status-item">
         <div>
@@ -479,7 +545,7 @@
     </div>
 
     <div class="log-list-title-wrap">
-      <h4 class="log-list-title">📋 최근 투약 일지 (실시간 공유)</h4>
+      <h4 class="log-list-title">📋 최근 투약 일지 (이 기기에 저장)</h4>
       <button class="btn-share-log" onclick="copyDoseShareText()">📲 오늘 기록 카톡 복사</button>
     </div>
     <div id="doseLogList"></div>
@@ -609,15 +675,15 @@
   }
 
   // ================= 1. 이 기기 로컬 저장 설정 =================
-  // 가족/기기 간 자동 동기화는 사용하지 않습니다.
-  // Y2 수동 버전과 같은 localStorage 키를 사용해 기존 로컬 데이터를 이어받습니다.
   const STORAGE_KEYS = {
     name: 'haon_baby_name',
     weight: 'haon_weight',
     birth: 'haon_baby_birth',
     clinicPhone: 'haon_clinic_phone',
     logs: 'haon_dose_logs',
-    pao: 'haon_pao_items'
+    pao: 'haon_pao_items',
+    water: 'haon_water_intake',
+    sponge: 'haon_sponge_timer'
   };
 
   function getLocalDateString(date = new Date()) {
@@ -634,6 +700,16 @@
     } catch (error) {
       console.warn(`로컬 데이터 읽기 실패: ${key}`, error);
       return [];
+    }
+  }
+
+  function readLocalObject(key) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (error) {
+      console.warn(`로컬 객체 읽기 실패: ${key}`, error);
+      return null;
     }
   }
 
@@ -716,6 +792,13 @@
   let sharedLogs = readLocalArray(STORAGE_KEYS.logs).sort((a, b) => new Date(b.time) - new Date(a.time));
   let sharedPao = readLocalArray(STORAGE_KEYS.pao).sort((a, b) => new Date(b.date) - new Date(a.date));
   let currentSuggestedDose = '';
+
+  // 미온수 마사지 타이머 상태
+  let spongeEndTime = null;
+  let spongeInterval = null;
+
+  // 브라우저 푸시 알림 중복 방지 기록
+  let notifiedSet = new Set();
 
   const nameInput = document.getElementById('babyNameInput');
   const weightInput = document.getElementById('babyWeight');
@@ -958,12 +1041,182 @@
   }
   searchInput.addEventListener('input', render);
 
-  // ================= 4. 타이머, 체온 및 투약 로그 =================
+  // ================= 4. 타이머, 체온, 경고 배너 및 열감기 케어 (로컬 저장) =================
+  function checkFeverAlert() {
+    const tempRaw = document.getElementById('tempInput').value.trim();
+    const box = document.getElementById('tempInputBox');
+    const banner = document.getElementById('feverAlertBanner');
+
+    box.classList.remove('warn-fever', 'high-fever');
+    banner.className = 'fever-alert-banner';
+
+    if (!tempRaw) return;
+    const tempVal = Number.parseFloat(tempRaw);
+    if (!Number.isFinite(tempVal)) return;
+
+    if (tempVal >= 39.0) {
+      box.classList.add('high-fever');
+      banner.classList.add('high');
+      banner.innerHTML = '🚨 <strong>39.0°C 이상 고열 주의!</strong> 해열제 투약 간격을 확인하고, 옷을 가볍게 입힌 뒤 미온수 마사지 및 수분 보충을 챙겨주세요. (처짐/경련 시 즉시 진료)';
+    } else if (tempVal >= 38.0) {
+      box.classList.add('warn-fever');
+      banner.classList.add('warn');
+      banner.innerHTML = '⚠️ <strong>미열/발열 구간입니다.</strong> 아기 컨디션(보챔, 수유량)을 살피며 수분을 조금씩 자주 먹여주세요.';
+    }
+  }
+
   function changeTemp(delta) {
     const tempInput = document.getElementById('tempInput');
     let current = parseFloat(tempInput.value) || 36.5;
     current = Math.max(34.0, Math.min(42.0, current + delta));
     tempInput.value = current.toFixed(1);
+    checkFeverAlert();
+  }
+
+  // 미온수 마사지 타이머 제어 (localStorage)
+  function initSpongeTimerFromLocal() {
+    const saved = readLocalObject(STORAGE_KEYS.sponge);
+    if (saved && saved.endTime && saved.endTime > Date.now()) {
+      spongeEndTime = saved.endTime;
+      startSpongeTicker();
+    } else {
+      spongeEndTime = null;
+      localStorage.removeItem(STORAGE_KEYS.sponge);
+      stopSpongeTicker();
+    }
+  }
+
+  function toggleSpongeTimer() {
+    if (spongeEndTime && spongeEndTime > Date.now()) {
+      resetSpongeTimer();
+    } else {
+      spongeEndTime = Date.now() + 30 * 60 * 1000;
+      writeLocalValue(STORAGE_KEYS.sponge, JSON.stringify({ endTime: spongeEndTime }));
+      startSpongeTicker();
+      showToast('미온수 마사지 30분 타이머가 시작되었습니다.');
+    }
+  }
+
+  function resetSpongeTimer() {
+    spongeEndTime = null;
+    localStorage.removeItem(STORAGE_KEYS.sponge);
+    stopSpongeTicker();
+    showToast('미온수 마사지 타이머가 초기화되었습니다.');
+  }
+
+  function startSpongeTicker() {
+    if (spongeInterval) clearInterval(spongeInterval);
+    const updateTick = () => {
+      if (!spongeEndTime) return;
+      const remain = spongeEndTime - Date.now();
+      const display = document.getElementById('spongeTimerDisplay');
+      const btn = document.getElementById('spongeActionBtn');
+
+      if (remain <= 0) {
+        display.textContent = '30분 완료!';
+        display.style.color = '#16a34a';
+        btn.textContent = '▶ 다시 시작';
+        btn.classList.remove('running');
+        sendBrowserNotification('🛁 미온수 마사지 30분 경과', '피부 자극 방지를 위해 닦기를 멈추고 체온을 다시 측정해 보세요.');
+        spongeEndTime = null;
+        localStorage.removeItem(STORAGE_KEYS.sponge);
+        clearInterval(spongeInterval);
+        return;
+      }
+
+      const mins = Math.floor(remain / 60000);
+      const secs = Math.floor((remain % 60000) / 1000);
+      display.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      display.style.color = '#dc2626';
+      btn.textContent = '■ 중지';
+      btn.classList.add('running');
+    };
+    updateTick();
+    spongeInterval = setInterval(updateTick, 1000);
+  }
+
+  function stopSpongeTicker() {
+    if (spongeInterval) clearInterval(spongeInterval);
+    const display = document.getElementById('spongeTimerDisplay');
+    const btn = document.getElementById('spongeActionBtn');
+    if (display && btn) {
+      display.textContent = '대기 중';
+      display.style.color = '#d97706';
+      btn.textContent = '▶ 30분 시작';
+      btn.classList.remove('running');
+    }
+  }
+
+  // 수분 섭취량 기록 (localStorage)
+  function renderWaterIntake() {
+    const saved = readLocalObject(STORAGE_KEYS.water);
+    const todayStr = getLocalDateString();
+    let total = 0;
+    if (saved && saved.date === todayStr) {
+      total = Number(saved.amount) || 0;
+    }
+    const display = document.getElementById('waterTotalDisplay');
+    if (display) display.textContent = `${total} ml`;
+  }
+
+  function addWaterLocal(ml) {
+    const todayStr = getLocalDateString();
+    const saved = readLocalObject(STORAGE_KEYS.water);
+    let currentAmount = 0;
+    if (saved && saved.date === todayStr) {
+      currentAmount = Number(saved.amount) || 0;
+    }
+    writeLocalValue(STORAGE_KEYS.water, JSON.stringify({
+      date: todayStr,
+      amount: currentAmount + ml
+    }));
+    renderWaterIntake();
+    showToast(`수분 섭취 +${ml}ml 기록 완료!`);
+  }
+
+  function resetWaterLocal() {
+    if (confirm('오늘 기록된 수분 섭취량을 0ml로 초기화할까요?')) {
+      writeLocalValue(STORAGE_KEYS.water, JSON.stringify({
+        date: getLocalDateString(),
+        amount: 0
+      }));
+      renderWaterIntake();
+    }
+  }
+
+  // 브라우저 푸시 알림 권한 및 발송
+  function updateNotiButtonUI() {
+    const btn = document.getElementById('btnEnableNoti');
+    if (!btn || !('Notification' in window)) return;
+    if (Notification.permission === 'granted') {
+      btn.textContent = '🔔 알림 켜짐';
+      btn.classList.add('enabled');
+    }
+  }
+
+  function requestNotiPermission() {
+    if (!('Notification' in window)) {
+      alert('이 브라우저는 푸시 알림을 지원하지 않습니다. (iOS의 경우 홈 화면에 추가 후 사용해 주세요)');
+      return;
+    }
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        updateNotiButtonUI();
+        showToast('투약 시간 알림이 활성화되었습니다!');
+      } else {
+        alert('브라우저 설정에서 알림 권한을 허용해 주세요.');
+      }
+    });
+  }
+
+  function sendBrowserNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(title, { body: body });
+      } catch (e) {
+        console.log('Notification error:', e);
+      }
+    }
   }
 
   function saveDoseLogs() {
@@ -1013,11 +1266,11 @@
   }
 
   function updateTimerView() {
+    renderWaterIntake();
     document.getElementById('red-quick-dose').textContent = '실제 투여량 직접 입력';
     document.getElementById('blue-quick-dose').textContent = '실제 투여량 직접 입력';
 
     const now = new Date();
-    // 이전 버전에서 자동 계산된 로그는 실제 투여량이 확인되지 않으므로 타이머 계산에서 제외합니다.
     const verifiedLogs = sharedLogs.filter(l => l.verifiedActual === true);
     const lastRed = verifiedLogs.find(l => l.colorKey === 'red');
     const lastBlue = verifiedLogs.find(l => l.colorKey === 'blue');
@@ -1099,7 +1352,16 @@
     if (!targetTime || now >= targetTime) {
       timeLabel.textContent = '기록상 대기시간 없음 · 제품별 지침 확인';
       badge.textContent = '설명서 확인';
-      badge.className = 'status-badge badge-wait';
+      badge.className = 'status-badge badge-ok';
+
+      if (targetTime && (now - targetTime) >= 0 && (now - targetTime) < 10 * 60 * 1000) {
+        const notiKey = `${targetType}_${targetTime.getTime()}`;
+        if (!notifiedSet.has(notiKey)) {
+          notifiedSet.add(notiKey);
+          const medLabel = targetType === 'acet' ? '🔴 아세트아미노펜 계열' : '🔵 덱시부/이부프로펜 계열';
+          sendBrowserNotification('⏱️ 해열제 참고 간격 도래', `${medLabel}의 기본 참고 간격이 지났습니다. 제품 지침 확인 후 필요 시 투약하세요.`);
+        }
+      }
     } else {
       const diffMs = targetTime - now;
       const diffMin = Math.ceil(diffMs / (1000 * 60));
@@ -1116,29 +1378,31 @@
 
   function copyDoseShareText() {
     const currentBabyName = nameInput.value.trim() || '하온';
-    if (sharedLogs.length === 0) {
-      alert('공유할 투약 기록이 없습니다.');
+    const todayStr = getLocalDateString();
+    const todayLogs = sharedLogs.filter(l => getLocalDateString(new Date(l.time)) === todayStr);
+    const waterText = document.getElementById('waterTotalDisplay').textContent;
+
+    if (sharedLogs.length === 0 && waterText === '0 ml') {
+      alert('공유할 투약 및 수분 기록이 없습니다.');
       return;
     }
 
-    const todayStr = getLocalDateString();
-    const todayLogs = sharedLogs.filter(l => getLocalDateString(new Date(l.time)) === todayStr);
-
-    let text = `[🍼 ${currentBabyName} 오늘 투약 기록 공유]\n`;
+    let text = `[🍼 ${currentBabyName} 오늘 케어 & 투약 기록 공유]\n`;
+    text += `💧 오늘 누적 수분 섭취: ${waterText}\n\n`;
     if (todayLogs.length === 0) {
       text += `• 오늘 투약된 기록이 없습니다.\n`;
     } else {
       todayLogs.forEach(l => {
         const d = new Date(l.time);
         const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        const tempText = l.temp ? ` (${escapeHtml(l.temp)})` : '';
-        text += `• ${timeStr} - ${escapeHtml(l.type)} ${escapeHtml(l.dose)}${tempText}${l.verifiedActual === true ? '' : ' [이전 계산 기록]' }\n`;
+        const tempText = l.temp ? ` (${l.temp})` : '';
+        text += `• ${timeStr} - ${l.type} ${l.dose}${tempText}${l.verifiedActual === true ? '' : ' [이전 계산 기록]' }\n`;
       });
     }
 
     const acetTime = document.getElementById('acet-target-time').textContent;
     const ibuTime = document.getElementById('ibu-target-time').textContent;
-    text += `\n⏱️ 다음 투약 가능 시간:\n`;
+    text += `\n⏱️ 다음 투약 참고 시간:\n`;
     text += `• 아세트: ${acetTime}\n`;
     text += `• 덱시/이부: ${ibuTime}`;
 
@@ -1237,7 +1501,6 @@
   function onKnMedInput() {
     const query = document.getElementById('knMed').value.trim().toLowerCase();
     const weight = parseFloat(weightInput.value) || 9.0;
-    const currentBabyName = nameInput.value.trim() || '하온';
     const hintBox = document.getElementById('knDoseHint');
 
     if (!query) {
@@ -1365,11 +1628,14 @@
   }
 
   document.getElementById('paoDate').value = getLocalDateString();
+  updateNotiButtonUI();
+  initSpongeTimerFromLocal();
+  renderWaterIntake();
 
   render();
   renderPaoList();
   updateTimerView();
-  setInterval(updateTimerView, 60000);
+  setInterval(updateTimerView, 30000);
 </script>
 
 </body>
